@@ -8,8 +8,8 @@ The Mingwpy project
 ###################
 
 The mingwpy project provides a compiler for Python extension modules that is
-based on the mingw-w64_ gcc compiler, but it compatible with Python and other
-extensions compiled with MS Visual C++.
+based on the mingw-w64_ gcc compiler, but where the compiled extensions are
+compatible with Python and other extensions compiled using MS Visual C++.
 
 ********
 Contents
@@ -17,6 +17,8 @@ Contents
 
 .. toctree::
     :maxdepth: 2
+
+    issues
 
 .. hidden toctree suppresses warnings about not-included documents
 

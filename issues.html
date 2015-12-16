@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Issues &mdash; mingwpy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
+    <link rel="next" title="README for mingwpy.github.io" href="README.html" />
+    <link rel="prev" title="The Mingwpy project" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="issues">
+<h1>Issues<a class="headerlink" href="#issues" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="ms-gcc-abi-incompatibilities">
+<h2>MS / gcc ABI incompatibilities<a class="headerlink" href="#ms-gcc-abi-incompatibilities" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></code></p>
+<p>Problem may be that MSVC on 32-bits only guarantees 4 (2^2) byte code
+alignment, whereas gcc can assume 16 (2^4) byte stack alignment.</p>
+<p>From:
+<a class="reference external" href="https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs">https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs</a></p>
+<blockquote>
+<div>Stack alignment discussion: GCC upstream agrees the default should be
+compatible with MSVC, however it’s not. GCC will likely not accept a patch
+to go back to the pre-4.6 stack alignment. Needs follow-up with Kai Tietz
+(he asked for a test case). Note: 32-bit only problem.</div></blockquote>
+</div>
+<div class="section" id="choice-of-msvc-runtime">
+<h2>Choice of MSVC runtime<a class="headerlink" href="#choice-of-msvc-runtime" title="Permalink to this headline">¶</a></h2>
+<p>All code in a single process should use one single version of the MSVC runtime
+(see <a class="reference external" href="https://msdn.microsoft.com/en-us/library/ms235460.aspx">MSDN article</a>).</p>
+<p>The Python that gets installed from downloading from <a class="reference external" href="https://python.org">https://python.org</a> is
+build with MSVC.  Therefore Python extensions for Python installed from these
+installers must use the same MSVC CRT.</p>
+<p>Specifically (see: <a class="reference external" href="https://matthew-brett.github.io/pydagogue/python_msvc.html#visual-studio-versions-used-to-compile-distributed-python-binaries">Python and MSVC versions</a>):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="21%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Python version</th>
+<th class="head">VC++ version</th>
+<th class="head">C runtime</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2.7.6</td>
+<td>9.0 / 2008</td>
+<td>MSVCR90.DLL</td>
+</tr>
+<tr class="row-odd"><td>3.2.3</td>
+<td>9.0 / 2008</td>
+<td>MSVCR90.DLL</td>
+</tr>
+<tr class="row-even"><td>3.3.5</td>
+<td>10.0 / 2010</td>
+<td>MSVCR100.DLL</td>
+</tr>
+<tr class="row-odd"><td>3.4.0</td>
+<td>10.0 / 2010</td>
+<td>MSVCR100.DLL</td>
+</tr>
+<tr class="row-even"><td>3.5.0</td>
+<td>14.0 / 2015</td>
+<td>UCRTBASE.DLL / VCRUNTIME140.DLL</td>
+</tr>
+</tbody>
+</table>
+<p>By default, mingw-w64 links to the MSVCRT.DLL.  This is a CRT dating from MSVC
+4.2, but updated to contain the runtimes for MSVC 6.0, plus some more recent
+(&gt;6.0) API calls (see these comments on <a class="reference external" href="http://sourceforge.net/p/mingw-w64/wiki2/The%20case%20against%20msvcrt.dll">using MSVCRT.DLL from Mingw-w64</a>).</p>
+<p>It is possible, using <a class="reference external" href="http://www.mingw.org/wiki/HOWTO_Use_the_GCC_specs_file">spec files</a>, to ask mingw-w64
+to link to other versions of the MSVC runtimes.  This could induce bad
+behavior if there is any API mismatch between the implementations in the
+mingw-w64 headers (tuned to MSVCRT.DLL) and those in the newer C runtime.</p>
+<p>What workarounds are necessary to use MSVC 9.0 / 2008 (Python 2.7)?</p>
+</div>
+<div class="section" id="the-vs-14-2015-runtime">
+<h2>The VS 14 / 2015 runtime<a class="headerlink" href="#the-vs-14-2015-runtime" title="Permalink to this headline">¶</a></h2>
+<p>Matters get more confusing for the latest (at time of writing) MSVC, version
+14 (MSVS 2015).</p>
+<p>Firstly, the CRT is now two files:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">ucrtbase.dll</span></code>;</li>
+<li><code class="docutils literal"><span class="pre">vcruntime140.dll</span></code>;</li>
+</ul>
+<p>of which the first will be keep a stable API / ABI across new VS releases.</p>
+<p>Second, linking correctly to these new 2015 libraries requires careful choice
+of the DLL import library.</p>
+<p>(Quoting Nathaniel Smith on email):</p>
+<blockquote>
+<div><p>The good news though is that I think we actually do know how to do this &#8211;
+basically it&#8217;s just, instead of linking directly to ucrtbase.dll, there
+are 15 &#8220;interface dlls&#8221; that export the various CRT symbols, so one has to
+link to the needed ones directly. (This is based on my fiddling around
+with the UCRT SDK, and Kai has apparently come to a similar conclusion.)
+So it&#8217;d be good to ask MS to confirm, but I&#8217;m ~90% sure this is right.</p>
+<dl class="docutils">
+<dt>Symbols and DLLs:</dt>
+<dd><a class="reference external" href="https://gist.github.com/njsmith/08b1e52b65ea90427bfd">https://gist.github.com/njsmith/08b1e52b65ea90427bfd</a></dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="math-precision-issues">
+<h2>Math precision issues<a class="headerlink" href="#math-precision-issues" title="Permalink to this headline">¶</a></h2>
+<p>(Quoting Nathaniel Smith on email):</p>
+<blockquote>
+<div><p>mingw-w64&#8217;s libm implementations are the borrowed from those used on BSDs,
+Linux, etc., and assume &#8211; consistent with the ABI on those other
+platforms &#8211; that the x87 FPU will be configured to use 80 bit precision
+for intermediate results. MSVC&#8217;s ABI, though, configures the x87 FPU into
+64 bit precision mode, and we don&#8217;t want to override that because who
+knows what would break.  The result is that when run in MSVC-compatibility
+mode, mingw-w64&#8217;s libm code currently assumes that it has higher internal
+precision than it actually has, and doesn&#8217;t necessarily produce the right
+answers. In particular the trig functions currently are just thin wrappers
+around the x87 fsin / fcos / etc. instructions. These are pretty sloppy
+and inaccurate, which doesn&#8217;t matter too much if you&#8217;re going to throw
+away all the low-order bits anyway... but if you&#8217;re going to keep those
+bits then it becomes more of an issue.</p>
+<p>[...]</p>
+</div></blockquote>
+<p>Investigating <code class="docutils literal"><span class="pre">sleef</span></code> library for needed functions.  Nathaniel suggested
+libm implementation from bionic (Android&#8217;s libc).</p>
+</div>
+<div class="section" id="disutils-issues">
+<h2>Disutils issues<a class="headerlink" href="#disutils-issues" title="Permalink to this headline">¶</a></h2>
+<p>How to return correct flags to mingw-w64, from Python built with MSVC?</p>
+</div>
+<div class="section" id="blas-lapack-libraries">
+<h2>BLAS / LAPACK libraries<a class="headerlink" href="#blas-lapack-libraries" title="Permalink to this headline">¶</a></h2>
+<p>Problems with OpenBLAS.</p>
+<p>A small number of test failures with numpy / scipy.</p>
+<p>ATLAS instead?</p>
+<p>MKL licensing appears to still require us (the wheel package authors) to
+require you (the wheel package users) not to reverse engineer the MKL
+binaries (an extra license restriction).  Package authors have to indemnify
+Intel against being sued by the package users.</p>
+</div>
+<div class="section" id="partial-to-do-list">
+<h2>Partial to-do list<a class="headerlink" href="#partial-to-do-list" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Implement linking to MSVC 2015 CRT libraries from mingw-w64;<ul>
+<li>work out correct method;</li>
+<li>discuss with MS developers;</li>
+<li>merge to mingw-w64;</li>
+</ul>
+</li>
+<li>Implement high-precision libm;<ul>
+<li>decide on library;</li>
+<li>merge to mingw-w64;</li>
+</ul>
+</li>
+<li>Develop &#8220;runtime agility&#8221; for mingw-w64 - method of adapting to different
+MSVC CRT libraries dynamically.  Maybe 50-60K of developer work / 2 man
+months.  On back-burner for mingw-w64 project.</li>
+<li>Create buildbot / appveyor scripts to build mingwpy library;</li>
+<li>Create test rig for OpenBLAS maybe via numpy, implement on buildbots with
+different processors or gcc compile farm.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Issues</a><ul>
+<li><a class="reference internal" href="#ms-gcc-abi-incompatibilities">MS / gcc ABI incompatibilities</a></li>
+<li><a class="reference internal" href="#choice-of-msvc-runtime">Choice of MSVC runtime</a></li>
+<li><a class="reference internal" href="#the-vs-14-2015-runtime">The VS 14 / 2015 runtime</a></li>
+<li><a class="reference internal" href="#math-precision-issues">Math precision issues</a></li>
+<li><a class="reference internal" href="#disutils-issues">Disutils issues</a></li>
+<li><a class="reference internal" href="#blas-lapack-libraries">BLAS / LAPACK libraries</a></li>
+<li><a class="reference internal" href="#partial-to-do-list">Partial to-do list</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">The Mingwpy project</a></li>
+      <li>Next: <a href="README.html" title="next chapter">README for mingwpy.github.io</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/issues.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Carl Kleffner and collaborators.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/issues.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
