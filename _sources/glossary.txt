@@ -1,7 +1,11 @@
+########
+Glossary
+########
+
 .. glossary::
 
     MSVC
-    Microsoft Visual C++.
+    Microsoft Visual C++
         The Microsoft standard C / C++ compiler. Part of :term:`Microsoft
         Visual Studio`.
 
