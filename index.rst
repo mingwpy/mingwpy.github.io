@@ -3,20 +3,34 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to mingwpy's documentation!
-===================================
+###################
+The Mingwpy project
+###################
 
-Contents:
+The mingwpy project provides a compiler for Python extension modules that is
+based on the mingw-w64_ gcc compiler, but it compatible with Python and other
+extensions compiled with MS Visual C++.
+
+********
+Contents
+********
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
+
+.. hidden toctree suppresses warnings about not-included documents
+
+.. toctree::
+    :hidden:
+
+    README.rst
 
 
-
+******************
 Indices and tables
-==================
+******************
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 
+.. include:: links_names.inc
