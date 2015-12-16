@@ -1,0 +1,427 @@
+##########################
+Python and DLLs on Windows
+##########################
+
+***********
+DLL loading
+***********
+
+Loading a DLL can be *implicit* or *explicit* (see `DLL linking
+<http://msdn.microsoft.com/en-us/library/9yd93633.aspx>`_).
+
+*Implicit* loading is also called *static* loading or *load-time* linking.  An
+executable (``.exe`` or other ``.dll``) has been compiled against the DLL, using
+a ``.lib`` import library file listing the symbols exported by the DLL.  The
+executable file has an import address table (IAT), with entries for each DLL
+function that the executable file needs.  When the executable is run, Windows
+finds and loads the DLL file named in the executable, and fills in the
+executable IAT with the loaded locations of each required function.
+
+*Explicit* loading is also called *dynamic* loading or *run-time* linking.  The
+executable explicitly calls one of the functions ``LoadLibrary``,
+``LoadLibraryEx`` with the name of the required DLL.  Calls to functions inside
+the loaded DLL need to be made via a function pointer.
+
+Thus, in the implicit case, Windows does the DLL loading based on the contents
+of the executable. In the explicit case, the executable does the loading.
+
+See `DLLs in Visual C++
+<http://msdn.microsoft.com/en-us/library/1ez7dh12.aspx>`_ for an overview.
+
+**********
+Which DLL?
+**********
+
+DLLs are a problem for general windows builds because it can be tricky making
+sure your extension gets the right DLL.
+
+This problem is sometimes called `DLL hell
+<http://en.wikipedia.org/wiki/DLL_hell>`_
+
+Let's say your executable links implicitly to ``myuseful.dll``.  How does
+Windows know where to look for ``myuseful.dll``?
+
+By default, Windows uses the `dynamic link library search order`_.
+
+.. _dynamic link library search order:
+   http://msdn.microsoft.com/en-us/library/windows/desktop/ms682586%28v=vs.85%29.aspx
+
+Here is the default DLL search order for desktop applications on Windows XP SP2 and
+later.  The words in parentheses are abbreviations I'll use later in the
+document.
+
+#. Directory containing the loading EXE application (``load-exe``)
+#. System directory (e.g. ``C:\Windows\System32``) (``sys32``)
+#. 16 bit system directory (``sys16``)
+#. Windows directory (e.g. ``C:\Windows``) (``win``)
+#. Current directory (``pwd``)
+#. Directories listed in PATH environment variable (``env-paths``)
+
+For reasons that will become clearer, call this the Safe Standard Search Order
+(S3O).
+
+We can use the abbreviations to describe this search order as ``load-exe, sys32,
+sys16, win, pwd, env-paths``.
+
+There are various exceptions and ways of tuning S3O, which are (quotes are from
+the document above):
+
+* Previous loading:
+
+   If a DLL with the same module name is already loaded in memory, the system
+   uses the loaded DLL, no matter which directory it is in. The system does not
+   search for the DLL.
+
+  Preference for an already-loaded DLL of the same name can only be avoided by
+  using application manifests and `side-by-side assemblies`_
+
+* Known DLLs: Windows has a list of "Known DLL" names maintained in the
+  registry. DLL names matching any of the known names are loaded from the system
+  and not searched for using S3O.  Again, this always occurs unless you override
+  the DLL by using `side-by-side assemblies`_
+
+* "safe DLL search mode": The "safe" in "Safe Standard Search Order" refers to
+  "safe DLL search mode".  This mode is enabled via a entry in the Windows
+  registry. It is enabled by default in all versions of Windows from XP SP2, but
+  disabled on previous versions of XP. If safe search mode is disabled, the
+  current directory gets searched after the directory containing the loading
+  application, rather than after the Windows directory. Using the abbreviations,
+  this gives the search order ``load-exe, pwd, sys32, sys16, win, env-paths``.
+  (See `loadlibrary explorer`_ for tests that suggest that enabling safe mode
+  in the registry doesn't change the search order from the disabled state; it
+  looks like the tests were done on XP SP2).
+
+* ``SetDllDirectory`` function: You can add a single path to the DLL search
+  order by calling the ``SetDllDirectory(new_path)`` function.  This inserts
+  ``new_path`` into the search order before the System directory in the sequence
+  above, and removes the current directory from the search path. See
+  `SetDllDirectory API doc
+  <http://msdn.microsoft.com/en-us/library/windows/desktop/ms686203(v=vs.85).aspx>`_.
+  This mode stays in place until specifically disabled by a call
+  ``SetDllDirectory(NULL)``.  With the abbreviations this gives ``load-exe,
+  new_path, sys32, sys16, win, env-paths``.  This order applies regardless of
+  the setting for "safe search".
+
+* ``LOAD_LIBRARY_SEARCH_*`` flags: You can specify an exact search order using the ``LOAD_LIBRARY_SEARCH_*``
+  flags, in systems that support them. Support for this API arrived in 2011 via
+  a security update to Vista and later, called KB2533623_. A version of this
+  update seems be present on a routinely updated copy of Windows 7 that I have.
+  Using this API, you can either pass ``LOAD_LIBRARY_SEARCH_*`` flags to
+  ``LoadLibraryEx`` to affect one call, or use ``SetDefaultDllDirectories`` to
+  set the default flags for the process.  See `LoadLibraryEx API doc
+  <http://msdn.microsoft.com/en-us/library/windows/desktop/ms684179(v=vs.85).aspx>`_
+  for detail.  Flags are:
+
+  * ``LOAD_LIBRARY_SEARCH_APPLICATION_DIR`` - search directory containing
+    application.
+  * ``LOAD_LIBRARY_SEARCH_SYSTEM32`` - search ``%windows%\system32`` directory.
+  * ``LOAD_LIBRARY_SEARCH_USER_DIRS`` - search any directories added either with (calls
+    to ``AddDllDirectory``; or by a call to ``SetDllDirectory``) (see below).
+  * ``LOAD_LIBRARY_SEARCH_DEFAULT_DIRS`` - combination of three flags above.
+  * ``LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR`` - search for other DLLs in the same
+    directory as the DLL to be loaded. This works when passing an absolute DLL
+    path to ``LoadLibraryEx``. It only applies to the immediate dependencies of
+    the DLL being loaded with ``LoadLibraryEx``.
+
+  This means you can add multiple paths to the search order with
+  several calls to ``AddDllDirectory(new_path)`` etc. (see `AddDllDirectory
+  API`_). Most unfortunately, the search order is undefined within the directories
+  you added with ``AddDllDirectory`` - see `AddDllDirectory API`_:
+
+    If AddDllDirectory is used to add more than one directory to the process DLL
+    search path, the order in which those directories are searched is
+    unspecified.
+
+  If you specify any of these ``LOAD_LIBRARY_SEARCH_*`` flags in a particular
+  ``LoadLibraryEx`` call, or via ``SetDefaultDllDiectories``, then Windows only
+  searches the directories you specified with the flags, and does not use the
+  S3O search order at all.
+
+* ``LOAD_WITH_ALTERED_SEARCH_PATH``: If you call
+  ``LoadLibraryEx("c:\path\to\my.dll")`` with the
+  ``LOAD_WITH_ALTERED_SEARCH_PATH`` flag, then, for executables resolved on that
+  call, Windows replaces the ``load-exe`` path with the directory containing the
+  DLL - here ``c:\path\to``.  Call this the ``load-dll`` path. Using
+  abbreviations this gives ``load-dll, sys32, sys16, win, pwd, env-paths`` in the
+  default safe-search-enabled mode, and ``load-dll, pwd, sys32, sys16, win,
+  env-paths`` when safe-search is disabled.  (This is what the documentation
+  says, but the author of `loadlibrary explorer`_ claims that, in fact, if
+  ``c:\path\to\my.dll`` does not exist, the call fails and the other paths do
+  not get searched, at least on XP SP2).
+
+  Experiments suggest that, if you first set DLL search order with
+  ``LOAD_LIBRARY_SEARCH_*`` flags to ``SetDefaultDllDiectories``, then call
+  ``LoadLibraryEx`` with ``LOAD_WITH_ALTERED_SEARCH_PATH``, then the
+  ``load-dll`` path will be prefixed to the search order given by your
+  ``LOAD_LIBRARY_SEARCH_*`` flags.
+
+* Redirection file: You can force Windows to look first for DLLs in the
+  directory containing the loading application, by making a `redirection file`_.
+  The redirection file is named for the application EXE, but with the extra
+  suffix of ``.local``.  If you have an application ``c:\path\myapp.exe`` the
+  redirection file would be called ``c:\path\myapp.exe.local``.  Windows ignores
+  the contents of the redirection file, it can be empty.  So, if
+  ``c:\path\myapp.exe`` calls ``LoadLibraryEx("c:\somewhere\mylib.dll")`` and a
+  file exists named ``c:\path\myapp.exe.local`` then the system will first look
+  for ``c:\path\mylib.dll`` before looking for ``c:\somewhere\mylib.dll``.
+
+  The relocation "file" can also be a directory. For our example, if
+  ``c:\path\myapp.exe.local`` is a directory, and you call
+  ``LoadLibraryEx("c:\somewhere\mylib.dll")`` then the system will first look
+  for ``c:\path\myapp.exe.local\mylib.dll`` before looking for
+  ``c:\somewhere\mylib.dll``.
+
+  As for other S3O modifications, "Known" DLLs can't be redirected in this way.
+  Any such redirection is ignored if the application has a `side by side
+  assemblies` application manifest (see below).  Also see `loadlibrary
+  explorer`_ for dissent as to whether this redirection actually works, tested
+  on XP SP2.
+
+.. _LoadLibraryEx API: http://msdn.microsoft.com/en-us/library/windows/desktop/ms684179(v=vs.85).aspx
+.. _AddDllDirectory API: http://msdn.microsoft.com/en-us/library/windows/desktop/hh310513(v=vs.85).aspx
+.. _KB2533623: http://support.microsoft.com/kb/2533623
+.. _redirection file: http://msdn.microsoft.com/en-us/library/windows/desktop/ms682600%28v=vs.85%29.aspx
+.. _loadlibrary explorer: http://www.flounder.com/loadlibrary_explorer.htm
+
+
+.. _side-by-side assemblies:
+
+***********************
+Side by side assemblies
+***********************
+
+You can specify exactly which DLLs get loaded for any executable using
+`side by side assemblies
+<http://msdn.microsoft.com/en-us/library/windows/desktop/dd408052(v=vs.85).aspx>`_.
+
+These are often abbreviated to SxS.
+
+The terminology of SxS can be very confusing. To help, here is a careful set of
+`SxS definitions
+<http://binglongx.wordpress.com/2009/11/18/dll-manifest-assembly-search-path>`_
+
+An "executable" in the following can be a DLL or an EXE (``.exe``).
+
+Let us say we have a DLL called ``mylib.dll``.  ``mylib.dll`` can get loaded by
+any of several applications, so doesn't have any control over libraries loaded
+previously. In turn, ``mylib.dll`` will load another DLL called
+``myruntime.dll``.  We want to make sure that ``mylib.dll`` loads exactly this
+``myruntime.dll`` regardless of any whether any other DLL called
+``myruntime.dll`` has already been loaded, and regardless of whether there is
+another ``myruntime.dll`` somewhere else on the DLL search path.
+
+We do this by including ``myruntime.dll`` in a SxS assembly. The SxS assembly
+information says "I have ``myruntime.dll``".  We then tell ``mylib.dll`` that it
+depends on this SxS assembly.  When ``mylib.dll`` tries to load
+``myruntime.dll`` it will first look in the SxS assembly, find this copy of
+``myruntime.dll`` and use that.
+
+Summary
+=======
+
+You use SxS assemblies like this:
+
+* The loading executable has an `application manifest`_. Let's say the loading
+  executable wants to load a DLL called ``myruntime.dll``
+* The application manifest for the executable declares that the executable
+  depends on a named assembly, say ``MyAssembly``
+* The system looks for this assembly using the `assembly searching sequence`_
+* The system is looking for an `assembly manifest`_ with a matching name
+  (``MyAssembly`` in our example). The assembly manifest declares the resources
+  (including DLLs) included in the named assembly.
+* If the assembly manifest (here for ``MyAssembly``) has an entry for
+  (here) ``myruntime.dll``, then the system loads the copy referenced by the
+  assembly, ignoring all others, including copies previously loaded.
+
+Making an SxS assembly
+======================
+
+You make a SxS by creating an `assembly manifest`_.
+
+The *assembly manifest* is some XML that describes the assembly.  The assembly
+is a collection of resources - typically one or more DLL files.  The XML can be
+written to a file with a suitable filename (see below).  If the assembly
+consists of a single DLL, the assembly manifest can be instead be embedded in
+the DLL file as a resource - see `embedding a manifest`_.  An embedded assembly
+manifest is always resource ID 1 in a DLL.
+
+In our example, the assembly manifest XML can be written as a file
+``mylib_assembly.manifest``.  The file name matches the name of the assembly
+that executables will use in their *application manifests* (see below).  The
+same XML can also be embedded into ``mylib.dll`` as a resource at ID 1.
+
+See the notes on "File name syntax" in `assembly manifest`_ for some
+complications of naming an assembly manifest file. These complications (from the
+`assembly searching sequence`_) explain why you can't use ``mylib.manifest`` as
+a name for your manifest file in this case.
+
+There's an example assembly manifest at the bottom of the `assembly manifest`_
+page.
+
+An assembly may either be a `shared assembly`_ or a `private assembly`_.  The
+two types of assemblies have the same structure, but a shared assembly may be
+shared between different applications and must be installed in a special
+"WinSxS" directory at ``%windows%\winsxs``. These assemblies have to be
+installed with a Windows installer.  A private assembly is an assembly included
+inside your application, and consists of files in your application folder.
+
+Telling an executable to use a SxS assembly
+===========================================
+
+An executable indicates that it is using a SxS assembly by using an `application
+manifest`_. The application manifest is some XML that expresses the dependency
+of the executable file on a particular SxS assembly.
+
+The XML can be a separate file or embedded as a resource in the executable.
+Because an EXE can't have an *assembly* manifest as well as an *application*
+manifest, the resource ID for an application manifest embedded in an EXE is 1.
+A DLL *can* have an assembly manifest as well as an application manifest,
+because the DLL might depend on other assemblies.  Therefore the resource ID for
+an *assembly* manifest embedded in a DLL is 1, and the resource ID for an
+*application* manifest embedded in a DLL is 2 (see `DLLs and resource ID 2
+manifests <http://blogs.msdn.com/b/jonwis/archive/2006/01/17/514192.aspx>`_).
+
+When Windows loads the executable file, it looks for an application manifest.
+If it finds one, it creates a new `activation context`_.  It then looks for and
+loads DLLs within this new context.  If a DLL gets loaded in the new context, it
+overrides any DLL of the same name that was loaded previously (`SxS activation
+context
+<http://blogs.msdn.com/b/junfeng/archive/2006/03/19/sxs-activation-context-activate-and-deactivate.aspx>`_).
+This is what allows us (in our example) to make sure that our own
+``myruntime.dll`` gets loaded instead of using - say - a DLL with the same name
+that has already been loaded.
+
+The application manifest specifies names of assemblies that the executable
+depends on.  With these names, Windows searches for the actual assemblies, using
+the `assembly searching sequence`_.
+
+There's an example application manifest at the bottom of the `application
+manifest`_ page.
+
+.. _application manifest: http://msdn.microsoft.com/en-us/library/aa374191.aspx
+.. _assembly manifest: http://msdn.microsoft.com/en-us/library/aa374219(v=vs.85).aspx
+.. _embedding a manifest: http://msdn.microsoft.com/en-us/library/ms235591.aspx
+.. _mt.exe: http://msdn.microsoft.com/en-us/library/aa375649(VS.85).aspx
+.. _activation context: http://msdn.microsoft.com/en-us/library/aa374153(v=vs.85).aspx
+.. _assembly searching sequence: http://msdn.microsoft.com/en-us/library/aa374224(v=vs.85).aspx
+.. _private assembly: http://msdn.microsoft.com/en-us/library/ff951638(v=vs.85).aspx
+.. _shared assembly: http://msdn.microsoft.com/en-us/library/aa375996.aspx
+
+Expanding the search path for assemblies
+========================================
+
+You may have noticed from the `assembly searching sequence`_ that private
+assemblies must generally be in the directory of the executable that depends on
+them.  In fact you can extend the search for assemblies by making an extra
+`application configuration file`_ and adding a ``probing`` element with a
+``privatePath`` attribute.  This allows you to specify relative paths with up to
+two levels of ``..`` in which to search for assemblies.  Unfortunately, this
+feature
+
+    is unavailable on systems earlier than Windows Server 2008 R2 and Windows 7
+
+(see `application configuration file`_).  There is an example configuration file
+in this `stackoverflow answer on SxS searching
+<http://stackoverflow.com/questions/10389197/can-i-modify-the-side-by-side-assembly-search-sequence>`_.
+
+.. _application configuration file: http://msdn.microsoft.com/en-us/library/aa374182.aspx
+
+Some useful links
+=================
+
+* `MS overview of side by side assemblies
+  <http://msdn.microsoft.com/en-us/library/windows/desktop/ff951640(v=vs.85).aspx>`_
+* `Side by side assembly page on Wikipedia
+  <http://en.wikipedia.org/wiki/Side-by-side_assembly>`_
+* `Blog on application manifests
+  <http://blogs.msdn.com/b/patricka/archive/2009/12/09/answers-to-several-application-manifest-mysteries-and-questions.aspx>`_
+* Some useful posts on side-by-side assemblies and manifests by user FarProc on
+  the MS forums:
+
+  * http://social.msdn.microsoft.com/Forums/vstudio/en-US/8aa6eb67-5429-41bf-bacb-3b6423e8edd1/vc-load-different-versions-of-the-dll-in-the-same-application?forum=vcgeneral
+  * http://social.msdn.microsoft.com/Forums/vstudio/en-US/b3eaa07f-7f92-4693-8aa1-b8fee0b92d2f/cannot-load-2-dlls-with-same-name-but-different-versions?forum=vcgeneral
+  * http://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/3e82b658-e070-4b88-aaf2-0649ddb222d2/how-to-write-manifest-file-to-pick-up-dlls-via-dll-redirection
+* `nmake exanples for embedding manifests
+  <http://blogs.msdn.com/b/nikolad/archive/2005/06/05/425359.aspx>`_
+
+**************************
+Analyzing DLL dependencies
+**************************
+
+* DLL loading analysis with `dependency walker
+  <http://www.dependencywalker.com/faq.html>`_
+
+***********
+Python DLLs
+***********
+
+On Windows, Python extension modules have file extensions ``.pyd`` as in
+``myextension.pyd``.
+
+Imagine you have a package like this::
+
+    mypackage/
+        myextension.pyd
+        runtime.dll
+    yourpackage/
+        yourextension.pyd
+        runtime.dll
+
+``myextension.pyd`` depends on my version of ``runtime.dll``, and
+``yourextension.pyd`` depends on your version of ``runtime.dll``.
+
+This leads to the general Windows "which DLL" problem.
+
+But, when I do: ``>>> import mypackage.myextension``, then ``myextension.pyd``
+gets loaded, as does my copy of ``runtime.dll``.  When I then do ``>>> import
+yourpackage.yourextension``, Windows sees that we already have a copy of
+``runtime.dll``, so doesn't load your copy of ``runtime.dll``.  If these two
+DLLs are not the same, this can cause nasty crashes, and crashes that depend on
+the order in which the two ``.pyd`` extensions get loaded.
+
+We also need to make sure that the DLLs we need can be found when the Python
+extension gets loaded.
+
+When Python loads an extension, it does it using the Windows ``LoadLibraryEx``
+call, like this::
+
+    hDLL = LoadLibraryEx(extension_path, NULL,
+                         LOAD_WITH_ALTERED_SEARCH_PATH);
+
+See: http://hg.python.org/cpython/file/3a1db0d2747e/Python/dynload_win.c#l195
+
+``LOAD_WITH_ALTERED_SEARCH_PATH`` causes Windows to look for DLLs first in the
+directory containing the extension (directory containing ``extension_path``)
+(see above).
+
+Specifically, if you do::
+
+    >>> import mypackage.myextension
+
+and ``myextension.pyd`` is in ``c:\Python27\Lib\site-packages\mypackage``, and
+``myextension.dll`` loads ``runtime.dll``, then Windows will look for
+``runtime.dll`` first in ``c:\Python27\Lib\site-packages\mypackage``.
+
+A common situation is that you want to put all needed DLLs in one directory, but
+there are extensions loading these DLLs are all over the file tree.
+
+For example, default builds of scipy using Mingw-w64 will depend on gcc and
+gfortran run-time DLLs. There will be extensions needing these DLLs in several
+places in the scipy package tree. In that case we may want to have a single
+directory called ``dlls`` in the Scipy tree containing these DLLs.  We can put
+this directory on the DLL search path with DLL path tricks used in `this ctypes
+code fragment <https://pytools.codeplex.com/workitem/1627>`_ (thanks to Steve
+Dower for the fragment, Carl Kleffner for finding it).
+
+Some unsorted links that also seemed useful:
+
+**********************
+Numpy and Windows DLLs
+**********************
+
+* `Discussion of gfortran and DLLs on Windows
+  <https://github.com/scipy/scipy/issues/2829>`_
+* Discussion of `DLL options for the Glasgow Haskell Compiler
+  <https://ghc.haskell.org/trac/ghc/wiki/DynamicByDefault/Windows>`_
+* `Loading a DLL from memory rather than disk
+  <https://github.com/fancycode/MemoryModule>`_

@@ -1,0 +1,66 @@
+mingw-w64 FAQ
+=============
+
+Originally by Carl Kleffner.
+
+What is mingw-w64
+-----------------
+
+mingw-w64 is a fork of the mingw32 project - see: http://sourceforge.net/apps/trac/mingw-w64/wiki/History
+
+Why choose mingw-w64 over mingw
+-------------------------------
+
+- 32 AND 64bit support
+- large file support
+- winpthread pthreads implementation, MIT licenced.
+- cross compiler toolchains available for Linux
+
+Official mingw-w64 releases
+---------------------------
+
+Source releases of the mingw-64 repository
+- http://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/
+
+Official mingw-w64 GCC toolchains
+---------------------------------
+
+'recommended' builds are available from the mingw-builds project at
+http://mingw-w64.sourceforge.net/download.php#mingw-builds for example:
+
+- http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/
+- http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.2/threads-posix/dwarf/
+
+These are common combinations of exception and thread models. You can find other
+combinations as well. Exception handling affects C++ development. Don't ever
+link object code with different types of exception and/or thread handling!
+
+Threads concerning the question 'where to find mingw-w64 builds':
+
+- http://article.gmane.org/gmane.comp.gnu.mingw.w64.general/7700
+- http://article.gmane.org/gmane.comp.gnu.mingw.w64.general/8484
+
+How to build a mingw-w64 based GCC toolchain on Windows
+-------------------------------------------------------
+
+"mingw-builds" is a set of scripts and patches for compiling the GCC toolchain
+under Windows with the help of msys2 POSIX environment -
+https://github.com/niXman/mingw-builds/tree/develop recent 'mingw-builds' GCC
+toolchains can be downloaded from the mingw-w64 sf.net (4)
+
+what is msys2
+-------------
+
+msys2 is the successor of msys. Msys2 is necessary as environment for the mingw build process on Windows.
+- http://sourceforge.net/p/msys2/wiki/MSYS2%20installation/
+
+Where to get precompiled mingw-w64 compiled libraries
+-----------------------------------------------------
+
+Recent mingw-w64 based tools and library packages together with sources and
+patches are available from archlinux as well as from the msys2 maintainers.
+
+- http://sourceforge.net/projects/mingw-w64-archlinux/files/  (i686: Sjlj | x86_64: SEH)
+- http://sourceforge.net/projects/msys2/files/REPOS/MINGW/  (i686: Dwarf | x86_64: SEH)
+
+See also [[Mingw static toolchain]].

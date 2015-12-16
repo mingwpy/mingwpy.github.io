@@ -1,0 +1,455 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Python and DLLs on Windows &mdash; mingwpy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="python-and-dlls-on-windows">
+<h1>Python and DLLs on Windows<a class="headerlink" href="#python-and-dlls-on-windows" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dll-loading">
+<h2>DLL loading<a class="headerlink" href="#dll-loading" title="Permalink to this headline">¶</a></h2>
+<p>Loading a DLL can be <em>implicit</em> or <em>explicit</em> (see <a class="reference external" href="http://msdn.microsoft.com/en-us/library/9yd93633.aspx">DLL linking</a>).</p>
+<p><em>Implicit</em> loading is also called <em>static</em> loading or <em>load-time</em> linking.  An
+executable (<code class="docutils literal"><span class="pre">.exe</span></code> or other <code class="docutils literal"><span class="pre">.dll</span></code>) has been compiled against the DLL, using
+a <code class="docutils literal"><span class="pre">.lib</span></code> import library file listing the symbols exported by the DLL.  The
+executable file has an import address table (IAT), with entries for each DLL
+function that the executable file needs.  When the executable is run, Windows
+finds and loads the DLL file named in the executable, and fills in the
+executable IAT with the loaded locations of each required function.</p>
+<p><em>Explicit</em> loading is also called <em>dynamic</em> loading or <em>run-time</em> linking.  The
+executable explicitly calls one of the functions <code class="docutils literal"><span class="pre">LoadLibrary</span></code>,
+<code class="docutils literal"><span class="pre">LoadLibraryEx</span></code> with the name of the required DLL.  Calls to functions inside
+the loaded DLL need to be made via a function pointer.</p>
+<p>Thus, in the implicit case, Windows does the DLL loading based on the contents
+of the executable. In the explicit case, the executable does the loading.</p>
+<p>See <a class="reference external" href="http://msdn.microsoft.com/en-us/library/1ez7dh12.aspx">DLLs in Visual C++</a> for an overview.</p>
+</div>
+<div class="section" id="which-dll">
+<h2>Which DLL?<a class="headerlink" href="#which-dll" title="Permalink to this headline">¶</a></h2>
+<p>DLLs are a problem for general windows builds because it can be tricky making
+sure your extension gets the right DLL.</p>
+<p>This problem is sometimes called <a class="reference external" href="http://en.wikipedia.org/wiki/DLL_hell">DLL hell</a></p>
+<p>Let&#8217;s say your executable links implicitly to <code class="docutils literal"><span class="pre">myuseful.dll</span></code>.  How does
+Windows know where to look for <code class="docutils literal"><span class="pre">myuseful.dll</span></code>?</p>
+<p>By default, Windows uses the <a class="reference external" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms682586%28v=vs.85%29.aspx">dynamic link library search order</a>.</p>
+<p>Here is the default DLL search order for desktop applications on Windows XP SP2 and
+later.  The words in parentheses are abbreviations I&#8217;ll use later in the
+document.</p>
+<ol class="arabic simple">
+<li>Directory containing the loading EXE application (<code class="docutils literal"><span class="pre">load-exe</span></code>)</li>
+<li>System directory (e.g. <code class="docutils literal"><span class="pre">C:\Windows\System32</span></code>) (<code class="docutils literal"><span class="pre">sys32</span></code>)</li>
+<li>16 bit system directory (<code class="docutils literal"><span class="pre">sys16</span></code>)</li>
+<li>Windows directory (e.g. <code class="docutils literal"><span class="pre">C:\Windows</span></code>) (<code class="docutils literal"><span class="pre">win</span></code>)</li>
+<li>Current directory (<code class="docutils literal"><span class="pre">pwd</span></code>)</li>
+<li>Directories listed in PATH environment variable (<code class="docutils literal"><span class="pre">env-paths</span></code>)</li>
+</ol>
+<p>For reasons that will become clearer, call this the Safe Standard Search Order
+(S3O).</p>
+<p>We can use the abbreviations to describe this search order as <code class="docutils literal"><span class="pre">load-exe,</span> <span class="pre">sys32,</span>
+<span class="pre">sys16,</span> <span class="pre">win,</span> <span class="pre">pwd,</span> <span class="pre">env-paths</span></code>.</p>
+<p>There are various exceptions and ways of tuning S3O, which are (quotes are from
+the document above):</p>
+<ul>
+<li><p class="first">Previous loading:</p>
+<blockquote>
+<div><p>If a DLL with the same module name is already loaded in memory, the system
+uses the loaded DLL, no matter which directory it is in. The system does not
+search for the DLL.</p>
+</div></blockquote>
+<p>Preference for an already-loaded DLL of the same name can only be avoided by
+using application manifests and <a class="reference internal" href="#side-by-side-assemblies">side-by-side assemblies</a></p>
+</li>
+<li><p class="first">Known DLLs: Windows has a list of &#8220;Known DLL&#8221; names maintained in the
+registry. DLL names matching any of the known names are loaded from the system
+and not searched for using S3O.  Again, this always occurs unless you override
+the DLL by using <a class="reference internal" href="#side-by-side-assemblies">side-by-side assemblies</a></p>
+</li>
+<li><p class="first">&#8220;safe DLL search mode&#8221;: The &#8220;safe&#8221; in &#8220;Safe Standard Search Order&#8221; refers to
+&#8220;safe DLL search mode&#8221;.  This mode is enabled via a entry in the Windows
+registry. It is enabled by default in all versions of Windows from XP SP2, but
+disabled on previous versions of XP. If safe search mode is disabled, the
+current directory gets searched after the directory containing the loading
+application, rather than after the Windows directory. Using the abbreviations,
+this gives the search order <code class="docutils literal"><span class="pre">load-exe,</span> <span class="pre">pwd,</span> <span class="pre">sys32,</span> <span class="pre">sys16,</span> <span class="pre">win,</span> <span class="pre">env-paths</span></code>.
+(See <a class="reference external" href="http://www.flounder.com/loadlibrary_explorer.htm">loadlibrary explorer</a> for tests that suggest that enabling safe mode
+in the registry doesn&#8217;t change the search order from the disabled state; it
+looks like the tests were done on XP SP2).</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">SetDllDirectory</span></code> function: You can add a single path to the DLL search
+order by calling the <code class="docutils literal"><span class="pre">SetDllDirectory(new_path)</span></code> function.  This inserts
+<code class="docutils literal"><span class="pre">new_path</span></code> into the search order before the System directory in the sequence
+above, and removes the current directory from the search path. See
+<a class="reference external" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms686203(v=vs.85).aspx">SetDllDirectory API doc</a>.
+This mode stays in place until specifically disabled by a call
+<code class="docutils literal"><span class="pre">SetDllDirectory(NULL)</span></code>.  With the abbreviations this gives <code class="docutils literal"><span class="pre">load-exe,</span>
+<span class="pre">new_path,</span> <span class="pre">sys32,</span> <span class="pre">sys16,</span> <span class="pre">win,</span> <span class="pre">env-paths</span></code>.  This order applies regardless of
+the setting for &#8220;safe search&#8221;.</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_*</span></code> flags: You can specify an exact search order using the <code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_*</span></code>
+flags, in systems that support them. Support for this API arrived in 2011 via
+a security update to Vista and later, called <a class="reference external" href="http://support.microsoft.com/kb/2533623">KB2533623</a>. A version of this
+update seems be present on a routinely updated copy of Windows 7 that I have.
+Using this API, you can either pass <code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_*</span></code> flags to
+<code class="docutils literal"><span class="pre">LoadLibraryEx</span></code> to affect one call, or use <code class="docutils literal"><span class="pre">SetDefaultDllDirectories</span></code> to
+set the default flags for the process.  See <a class="reference external" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms684179(v=vs.85).aspx">LoadLibraryEx API doc</a>
+for detail.  Flags are:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_APPLICATION_DIR</span></code> - search directory containing
+application.</li>
+<li><code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_SYSTEM32</span></code> - search <code class="docutils literal"><span class="pre">%windows%\system32</span></code> directory.</li>
+<li><code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_USER_DIRS</span></code> - search any directories added either with (calls
+to <code class="docutils literal"><span class="pre">AddDllDirectory</span></code>; or by a call to <code class="docutils literal"><span class="pre">SetDllDirectory</span></code>) (see below).</li>
+<li><code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_DEFAULT_DIRS</span></code> - combination of three flags above.</li>
+<li><code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR</span></code> - search for other DLLs in the same
+directory as the DLL to be loaded. This works when passing an absolute DLL
+path to <code class="docutils literal"><span class="pre">LoadLibraryEx</span></code>. It only applies to the immediate dependencies of
+the DLL being loaded with <code class="docutils literal"><span class="pre">LoadLibraryEx</span></code>.</li>
+</ul>
+<p>This means you can add multiple paths to the search order with
+several calls to <code class="docutils literal"><span class="pre">AddDllDirectory(new_path)</span></code> etc. (see <a class="reference external" href="http://msdn.microsoft.com/en-us/library/windows/desktop/hh310513(v=vs.85).aspx">AddDllDirectory
+API</a>). Most unfortunately, the search order is undefined within the directories
+you added with <code class="docutils literal"><span class="pre">AddDllDirectory</span></code> - see <a class="reference external" href="http://msdn.microsoft.com/en-us/library/windows/desktop/hh310513(v=vs.85).aspx">AddDllDirectory API</a>:</p>
+<blockquote>
+<div><p>If AddDllDirectory is used to add more than one directory to the process DLL
+search path, the order in which those directories are searched is
+unspecified.</p>
+</div></blockquote>
+<p>If you specify any of these <code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_*</span></code> flags in a particular
+<code class="docutils literal"><span class="pre">LoadLibraryEx</span></code> call, or via <code class="docutils literal"><span class="pre">SetDefaultDllDiectories</span></code>, then Windows only
+searches the directories you specified with the flags, and does not use the
+S3O search order at all.</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">LOAD_WITH_ALTERED_SEARCH_PATH</span></code>: If you call
+<code class="docutils literal"><span class="pre">LoadLibraryEx(&quot;c:\path\to\my.dll&quot;)</span></code> with the
+<code class="docutils literal"><span class="pre">LOAD_WITH_ALTERED_SEARCH_PATH</span></code> flag, then, for executables resolved on that
+call, Windows replaces the <code class="docutils literal"><span class="pre">load-exe</span></code> path with the directory containing the
+DLL - here <code class="docutils literal"><span class="pre">c:\path\to</span></code>.  Call this the <code class="docutils literal"><span class="pre">load-dll</span></code> path. Using
+abbreviations this gives <code class="docutils literal"><span class="pre">load-dll,</span> <span class="pre">sys32,</span> <span class="pre">sys16,</span> <span class="pre">win,</span> <span class="pre">pwd,</span> <span class="pre">env-paths</span></code> in the
+default safe-search-enabled mode, and <code class="docutils literal"><span class="pre">load-dll,</span> <span class="pre">pwd,</span> <span class="pre">sys32,</span> <span class="pre">sys16,</span> <span class="pre">win,</span>
+<span class="pre">env-paths</span></code> when safe-search is disabled.  (This is what the documentation
+says, but the author of <a class="reference external" href="http://www.flounder.com/loadlibrary_explorer.htm">loadlibrary explorer</a> claims that, in fact, if
+<code class="docutils literal"><span class="pre">c:\path\to\my.dll</span></code> does not exist, the call fails and the other paths do
+not get searched, at least on XP SP2).</p>
+<p>Experiments suggest that, if you first set DLL search order with
+<code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_*</span></code> flags to <code class="docutils literal"><span class="pre">SetDefaultDllDiectories</span></code>, then call
+<code class="docutils literal"><span class="pre">LoadLibraryEx</span></code> with <code class="docutils literal"><span class="pre">LOAD_WITH_ALTERED_SEARCH_PATH</span></code>, then the
+<code class="docutils literal"><span class="pre">load-dll</span></code> path will be prefixed to the search order given by your
+<code class="docutils literal"><span class="pre">LOAD_LIBRARY_SEARCH_*</span></code> flags.</p>
+</li>
+<li><p class="first">Redirection file: You can force Windows to look first for DLLs in the
+directory containing the loading application, by making a <a class="reference external" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms682600%28v=vs.85%29.aspx">redirection file</a>.
+The redirection file is named for the application EXE, but with the extra
+suffix of <code class="docutils literal"><span class="pre">.local</span></code>.  If you have an application <code class="docutils literal"><span class="pre">c:\path\myapp.exe</span></code> the
+redirection file would be called <code class="docutils literal"><span class="pre">c:\path\myapp.exe.local</span></code>.  Windows ignores
+the contents of the redirection file, it can be empty.  So, if
+<code class="docutils literal"><span class="pre">c:\path\myapp.exe</span></code> calls <code class="docutils literal"><span class="pre">LoadLibraryEx(&quot;c:\somewhere\mylib.dll&quot;)</span></code> and a
+file exists named <code class="docutils literal"><span class="pre">c:\path\myapp.exe.local</span></code> then the system will first look
+for <code class="docutils literal"><span class="pre">c:\path\mylib.dll</span></code> before looking for <code class="docutils literal"><span class="pre">c:\somewhere\mylib.dll</span></code>.</p>
+<p>The relocation &#8220;file&#8221; can also be a directory. For our example, if
+<code class="docutils literal"><span class="pre">c:\path\myapp.exe.local</span></code> is a directory, and you call
+<code class="docutils literal"><span class="pre">LoadLibraryEx(&quot;c:\somewhere\mylib.dll&quot;)</span></code> then the system will first look
+for <code class="docutils literal"><span class="pre">c:\path\myapp.exe.local\mylib.dll</span></code> before looking for
+<code class="docutils literal"><span class="pre">c:\somewhere\mylib.dll</span></code>.</p>
+<p>As for other S3O modifications, &#8220;Known&#8221; DLLs can&#8217;t be redirected in this way.
+Any such redirection is ignored if the application has a <cite>side by side
+assemblies</cite> application manifest (see below).  Also see <a class="reference external" href="http://www.flounder.com/loadlibrary_explorer.htm">loadlibrary
+explorer</a> for dissent as to whether this redirection actually works, tested
+on XP SP2.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="side-by-side-assemblies">
+<span id="id1"></span><h2>Side by side assemblies<a class="headerlink" href="#side-by-side-assemblies" title="Permalink to this headline">¶</a></h2>
+<p>You can specify exactly which DLLs get loaded for any executable using
+<a class="reference external" href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd408052(v=vs.85).aspx">side by side assemblies</a>.</p>
+<p>These are often abbreviated to SxS.</p>
+<p>The terminology of SxS can be very confusing. To help, here is a careful set of
+<a class="reference external" href="http://binglongx.wordpress.com/2009/11/18/dll-manifest-assembly-search-path">SxS definitions</a></p>
+<p>An &#8220;executable&#8221; in the following can be a DLL or an EXE (<code class="docutils literal"><span class="pre">.exe</span></code>).</p>
+<p>Let us say we have a DLL called <code class="docutils literal"><span class="pre">mylib.dll</span></code>.  <code class="docutils literal"><span class="pre">mylib.dll</span></code> can get loaded by
+any of several applications, so doesn&#8217;t have any control over libraries loaded
+previously. In turn, <code class="docutils literal"><span class="pre">mylib.dll</span></code> will load another DLL called
+<code class="docutils literal"><span class="pre">myruntime.dll</span></code>.  We want to make sure that <code class="docutils literal"><span class="pre">mylib.dll</span></code> loads exactly this
+<code class="docutils literal"><span class="pre">myruntime.dll</span></code> regardless of any whether any other DLL called
+<code class="docutils literal"><span class="pre">myruntime.dll</span></code> has already been loaded, and regardless of whether there is
+another <code class="docutils literal"><span class="pre">myruntime.dll</span></code> somewhere else on the DLL search path.</p>
+<p>We do this by including <code class="docutils literal"><span class="pre">myruntime.dll</span></code> in a SxS assembly. The SxS assembly
+information says &#8220;I have <code class="docutils literal"><span class="pre">myruntime.dll</span></code>&#8221;.  We then tell <code class="docutils literal"><span class="pre">mylib.dll</span></code> that it
+depends on this SxS assembly.  When <code class="docutils literal"><span class="pre">mylib.dll</span></code> tries to load
+<code class="docutils literal"><span class="pre">myruntime.dll</span></code> it will first look in the SxS assembly, find this copy of
+<code class="docutils literal"><span class="pre">myruntime.dll</span></code> and use that.</p>
+<div class="section" id="summary">
+<h3>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<p>You use SxS assemblies like this:</p>
+<ul class="simple">
+<li>The loading executable has an <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374191.aspx">application manifest</a>. Let&#8217;s say the loading
+executable wants to load a DLL called <code class="docutils literal"><span class="pre">myruntime.dll</span></code></li>
+<li>The application manifest for the executable declares that the executable
+depends on a named assembly, say <code class="docutils literal"><span class="pre">MyAssembly</span></code></li>
+<li>The system looks for this assembly using the <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374224(v=vs.85).aspx">assembly searching sequence</a></li>
+<li>The system is looking for an <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374219(v=vs.85).aspx">assembly manifest</a> with a matching name
+(<code class="docutils literal"><span class="pre">MyAssembly</span></code> in our example). The assembly manifest declares the resources
+(including DLLs) included in the named assembly.</li>
+<li>If the assembly manifest (here for <code class="docutils literal"><span class="pre">MyAssembly</span></code>) has an entry for
+(here) <code class="docutils literal"><span class="pre">myruntime.dll</span></code>, then the system loads the copy referenced by the
+assembly, ignoring all others, including copies previously loaded.</li>
+</ul>
+</div>
+<div class="section" id="making-an-sxs-assembly">
+<h3>Making an SxS assembly<a class="headerlink" href="#making-an-sxs-assembly" title="Permalink to this headline">¶</a></h3>
+<p>You make a SxS by creating an <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374219(v=vs.85).aspx">assembly manifest</a>.</p>
+<p>The <em>assembly manifest</em> is some XML that describes the assembly.  The assembly
+is a collection of resources - typically one or more DLL files.  The XML can be
+written to a file with a suitable filename (see below).  If the assembly
+consists of a single DLL, the assembly manifest can be instead be embedded in
+the DLL file as a resource - see <a class="reference external" href="http://msdn.microsoft.com/en-us/library/ms235591.aspx">embedding a manifest</a>.  An embedded assembly
+manifest is always resource ID 1 in a DLL.</p>
+<p>In our example, the assembly manifest XML can be written as a file
+<code class="docutils literal"><span class="pre">mylib_assembly.manifest</span></code>.  The file name matches the name of the assembly
+that executables will use in their <em>application manifests</em> (see below).  The
+same XML can also be embedded into <code class="docutils literal"><span class="pre">mylib.dll</span></code> as a resource at ID 1.</p>
+<p>See the notes on &#8220;File name syntax&#8221; in <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374219(v=vs.85).aspx">assembly manifest</a> for some
+complications of naming an assembly manifest file. These complications (from the
+<a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374224(v=vs.85).aspx">assembly searching sequence</a>) explain why you can&#8217;t use <code class="docutils literal"><span class="pre">mylib.manifest</span></code> as
+a name for your manifest file in this case.</p>
+<p>There&#8217;s an example assembly manifest at the bottom of the <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374219(v=vs.85).aspx">assembly manifest</a>
+page.</p>
+<p>An assembly may either be a <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa375996.aspx">shared assembly</a> or a <a class="reference external" href="http://msdn.microsoft.com/en-us/library/ff951638(v=vs.85).aspx">private assembly</a>.  The
+two types of assemblies have the same structure, but a shared assembly may be
+shared between different applications and must be installed in a special
+&#8220;WinSxS&#8221; directory at <code class="docutils literal"><span class="pre">%windows%\winsxs</span></code>. These assemblies have to be
+installed with a Windows installer.  A private assembly is an assembly included
+inside your application, and consists of files in your application folder.</p>
+</div>
+<div class="section" id="telling-an-executable-to-use-a-sxs-assembly">
+<h3>Telling an executable to use a SxS assembly<a class="headerlink" href="#telling-an-executable-to-use-a-sxs-assembly" title="Permalink to this headline">¶</a></h3>
+<p>An executable indicates that it is using a SxS assembly by using an <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374191.aspx">application
+manifest</a>. The application manifest is some XML that expresses the dependency
+of the executable file on a particular SxS assembly.</p>
+<p>The XML can be a separate file or embedded as a resource in the executable.
+Because an EXE can&#8217;t have an <em>assembly</em> manifest as well as an <em>application</em>
+manifest, the resource ID for an application manifest embedded in an EXE is 1.
+A DLL <em>can</em> have an assembly manifest as well as an application manifest,
+because the DLL might depend on other assemblies.  Therefore the resource ID for
+an <em>assembly</em> manifest embedded in a DLL is 1, and the resource ID for an
+<em>application</em> manifest embedded in a DLL is 2 (see <a class="reference external" href="http://blogs.msdn.com/b/jonwis/archive/2006/01/17/514192.aspx">DLLs and resource ID 2
+manifests</a>).</p>
+<p>When Windows loads the executable file, it looks for an application manifest.
+If it finds one, it creates a new <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374153(v=vs.85).aspx">activation context</a>.  It then looks for and
+loads DLLs within this new context.  If a DLL gets loaded in the new context, it
+overrides any DLL of the same name that was loaded previously (<a class="reference external" href="http://blogs.msdn.com/b/junfeng/archive/2006/03/19/sxs-activation-context-activate-and-deactivate.aspx">SxS activation
+context</a>).
+This is what allows us (in our example) to make sure that our own
+<code class="docutils literal"><span class="pre">myruntime.dll</span></code> gets loaded instead of using - say - a DLL with the same name
+that has already been loaded.</p>
+<p>The application manifest specifies names of assemblies that the executable
+depends on.  With these names, Windows searches for the actual assemblies, using
+the <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374224(v=vs.85).aspx">assembly searching sequence</a>.</p>
+<p>There&#8217;s an example application manifest at the bottom of the <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374191.aspx">application
+manifest</a> page.</p>
+</div>
+<div class="section" id="expanding-the-search-path-for-assemblies">
+<h3>Expanding the search path for assemblies<a class="headerlink" href="#expanding-the-search-path-for-assemblies" title="Permalink to this headline">¶</a></h3>
+<p>You may have noticed from the <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374224(v=vs.85).aspx">assembly searching sequence</a> that private
+assemblies must generally be in the directory of the executable that depends on
+them.  In fact you can extend the search for assemblies by making an extra
+<a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374182.aspx">application configuration file</a> and adding a <code class="docutils literal"><span class="pre">probing</span></code> element with a
+<code class="docutils literal"><span class="pre">privatePath</span></code> attribute.  This allows you to specify relative paths with up to
+two levels of <code class="docutils literal"><span class="pre">..</span></code> in which to search for assemblies.  Unfortunately, this
+feature</p>
+<blockquote>
+<div>is unavailable on systems earlier than Windows Server 2008 R2 and Windows 7</div></blockquote>
+<p>(see <a class="reference external" href="http://msdn.microsoft.com/en-us/library/aa374182.aspx">application configuration file</a>).  There is an example configuration file
+in this <a class="reference external" href="http://stackoverflow.com/questions/10389197/can-i-modify-the-side-by-side-assembly-search-sequence">stackoverflow answer on SxS searching</a>.</p>
+</div>
+<div class="section" id="some-useful-links">
+<h3>Some useful links<a class="headerlink" href="#some-useful-links" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://msdn.microsoft.com/en-us/library/windows/desktop/ff951640(v=vs.85).aspx">MS overview of side by side assemblies</a></li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Side-by-side_assembly">Side by side assembly page on Wikipedia</a></li>
+<li><a class="reference external" href="http://blogs.msdn.com/b/patricka/archive/2009/12/09/answers-to-several-application-manifest-mysteries-and-questions.aspx">Blog on application manifests</a></li>
+<li>Some useful posts on side-by-side assemblies and manifests by user FarProc on
+the MS forums:<ul>
+<li><a class="reference external" href="http://social.msdn.microsoft.com/Forums/vstudio/en-US/8aa6eb67-5429-41bf-bacb-3b6423e8edd1/vc-load-different-versions-of-the-dll-in-the-same-application?forum=vcgeneral">http://social.msdn.microsoft.com/Forums/vstudio/en-US/8aa6eb67-5429-41bf-bacb-3b6423e8edd1/vc-load-different-versions-of-the-dll-in-the-same-application?forum=vcgeneral</a></li>
+<li><a class="reference external" href="http://social.msdn.microsoft.com/Forums/vstudio/en-US/b3eaa07f-7f92-4693-8aa1-b8fee0b92d2f/cannot-load-2-dlls-with-same-name-but-different-versions?forum=vcgeneral">http://social.msdn.microsoft.com/Forums/vstudio/en-US/b3eaa07f-7f92-4693-8aa1-b8fee0b92d2f/cannot-load-2-dlls-with-same-name-but-different-versions?forum=vcgeneral</a></li>
+<li><a class="reference external" href="http://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/3e82b658-e070-4b88-aaf2-0649ddb222d2/how-to-write-manifest-file-to-pick-up-dlls-via-dll-redirection">http://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/3e82b658-e070-4b88-aaf2-0649ddb222d2/how-to-write-manifest-file-to-pick-up-dlls-via-dll-redirection</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="http://blogs.msdn.com/b/nikolad/archive/2005/06/05/425359.aspx">nmake exanples for embedding manifests</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="analyzing-dll-dependencies">
+<h2>Analyzing DLL dependencies<a class="headerlink" href="#analyzing-dll-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>DLL loading analysis with <a class="reference external" href="http://www.dependencywalker.com/faq.html">dependency walker</a></li>
+</ul>
+</div>
+<div class="section" id="python-dlls">
+<h2>Python DLLs<a class="headerlink" href="#python-dlls" title="Permalink to this headline">¶</a></h2>
+<p>On Windows, Python extension modules have file extensions <code class="docutils literal"><span class="pre">.pyd</span></code> as in
+<code class="docutils literal"><span class="pre">myextension.pyd</span></code>.</p>
+<p>Imagine you have a package like this:</p>
+<div class="highlight-python"><div class="highlight"><pre>mypackage/
+    myextension.pyd
+    runtime.dll
+yourpackage/
+    yourextension.pyd
+    runtime.dll
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">myextension.pyd</span></code> depends on my version of <code class="docutils literal"><span class="pre">runtime.dll</span></code>, and
+<code class="docutils literal"><span class="pre">yourextension.pyd</span></code> depends on your version of <code class="docutils literal"><span class="pre">runtime.dll</span></code>.</p>
+<p>This leads to the general Windows &#8220;which DLL&#8221; problem.</p>
+<p>But, when I do: <code class="docutils literal"><span class="pre">&gt;&gt;&gt;</span> <span class="pre">import</span> <span class="pre">mypackage.myextension</span></code>, then <code class="docutils literal"><span class="pre">myextension.pyd</span></code>
+gets loaded, as does my copy of <code class="docutils literal"><span class="pre">runtime.dll</span></code>.  When I then do <code class="docutils literal"><span class="pre">&gt;&gt;&gt;</span> <span class="pre">import</span>
+<span class="pre">yourpackage.yourextension</span></code>, Windows sees that we already have a copy of
+<code class="docutils literal"><span class="pre">runtime.dll</span></code>, so doesn&#8217;t load your copy of <code class="docutils literal"><span class="pre">runtime.dll</span></code>.  If these two
+DLLs are not the same, this can cause nasty crashes, and crashes that depend on
+the order in which the two <code class="docutils literal"><span class="pre">.pyd</span></code> extensions get loaded.</p>
+<p>We also need to make sure that the DLLs we need can be found when the Python
+extension gets loaded.</p>
+<p>When Python loads an extension, it does it using the Windows <code class="docutils literal"><span class="pre">LoadLibraryEx</span></code>
+call, like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">hDLL</span> <span class="o">=</span> <span class="n">LoadLibraryEx</span><span class="p">(</span><span class="n">extension_path</span><span class="p">,</span> <span class="n">NULL</span><span class="p">,</span>
+                     <span class="n">LOAD_WITH_ALTERED_SEARCH_PATH</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>See: <a class="reference external" href="http://hg.python.org/cpython/file/3a1db0d2747e/Python/dynload_win.c#l195">http://hg.python.org/cpython/file/3a1db0d2747e/Python/dynload_win.c#l195</a></p>
+<p><code class="docutils literal"><span class="pre">LOAD_WITH_ALTERED_SEARCH_PATH</span></code> causes Windows to look for DLLs first in the
+directory containing the extension (directory containing <code class="docutils literal"><span class="pre">extension_path</span></code>)
+(see above).</p>
+<p>Specifically, if you do:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">mypackage.myextension</span>
+</pre></div>
+</div>
+<p>and <code class="docutils literal"><span class="pre">myextension.pyd</span></code> is in <code class="docutils literal"><span class="pre">c:\Python27\Lib\site-packages\mypackage</span></code>, and
+<code class="docutils literal"><span class="pre">myextension.dll</span></code> loads <code class="docutils literal"><span class="pre">runtime.dll</span></code>, then Windows will look for
+<code class="docutils literal"><span class="pre">runtime.dll</span></code> first in <code class="docutils literal"><span class="pre">c:\Python27\Lib\site-packages\mypackage</span></code>.</p>
+<p>A common situation is that you want to put all needed DLLs in one directory, but
+there are extensions loading these DLLs are all over the file tree.</p>
+<p>For example, default builds of scipy using Mingw-w64 will depend on gcc and
+gfortran run-time DLLs. There will be extensions needing these DLLs in several
+places in the scipy package tree. In that case we may want to have a single
+directory called <code class="docutils literal"><span class="pre">dlls</span></code> in the Scipy tree containing these DLLs.  We can put
+this directory on the DLL search path with DLL path tricks used in <a class="reference external" href="https://pytools.codeplex.com/workitem/1627">this ctypes
+code fragment</a> (thanks to Steve
+Dower for the fragment, Carl Kleffner for finding it).</p>
+<p>Some unsorted links that also seemed useful:</p>
+</div>
+<div class="section" id="numpy-and-windows-dlls">
+<h2>Numpy and Windows DLLs<a class="headerlink" href="#numpy-and-windows-dlls" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/scipy/scipy/issues/2829">Discussion of gfortran and DLLs on Windows</a></li>
+<li>Discussion of <a class="reference external" href="https://ghc.haskell.org/trac/ghc/wiki/DynamicByDefault/Windows">DLL options for the Glasgow Haskell Compiler</a></li>
+<li><a class="reference external" href="https://github.com/fancycode/MemoryModule">Loading a DLL from memory rather than disk</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Python and DLLs on Windows</a><ul>
+<li><a class="reference internal" href="#dll-loading">DLL loading</a></li>
+<li><a class="reference internal" href="#which-dll">Which DLL?</a></li>
+<li><a class="reference internal" href="#side-by-side-assemblies">Side by side assemblies</a><ul>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#making-an-sxs-assembly">Making an SxS assembly</a></li>
+<li><a class="reference internal" href="#telling-an-executable-to-use-a-sxs-assembly">Telling an executable to use a SxS assembly</a></li>
+<li><a class="reference internal" href="#expanding-the-search-path-for-assemblies">Expanding the search path for assemblies</a></li>
+<li><a class="reference internal" href="#some-useful-links">Some useful links</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#analyzing-dll-dependencies">Analyzing DLL dependencies</a></li>
+<li><a class="reference internal" href="#python-dlls">Python DLLs</a></li>
+<li><a class="reference internal" href="#numpy-and-windows-dlls">Numpy and Windows DLLs</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/windows-dll-notes.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Carl Kleffner and collaborators.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/windows-dll-notes.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

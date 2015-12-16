@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Mingw static toolchain &mdash; mingwpy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="mingw-static-toolchain">
+<h1>Mingw static toolchain<a class="headerlink" href="#mingw-static-toolchain" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-a-static-gcc-toolchain">
+<h2>What is a static GCC toolchain?<a class="headerlink" href="#what-is-a-static-gcc-toolchain" title="Permalink to this headline">¶</a></h2>
+<p>GCC as well as the all necessary libraries for a toolchain can be compiled with
+&#8220;-disabled-shared&#8221;. This is supported by the mingw-builds scripts as an option.
+All the necessary object code from the GCC runtimes will be statically linked
+into the binaries. As a consequence the binary size will be increased in
+comparison to the standard toolchains. The advantage is, that there will be no
+dependency to external GCC runtime libraries, so the deployment of python
+extensions is greatly improved. Using such a toolchain is more reliable than
+using -static-XXX flags.  However, exception heavy C++ programs (i.e. QT)
+should be compiled with shared runtimes to avoid  problems with exceptions
+handling over DLL boundaries.  For building typically Python extensions a
+customized static GCC toolchain is the best compromise IMHO.</p>
+</div>
+<div class="section" id="where-is-it">
+<h2>Where is it?<a class="headerlink" href="#where-is-it" title="Permalink to this headline">¶</a></h2>
+<p>Latest versions should be at:
+<a class="reference external" href="https://bitbucket.org/carlkl/mingw-w64-for-python/downloads">https://bitbucket.org/carlkl/mingw-w64-for-python/downloads</a></p>
+</div>
+<div class="section" id="what-s-in-it">
+<h2>What&#8217;s in it?<a class="headerlink" href="#what-s-in-it" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference internal" href="#notes">notes</a> below.</p>
+<ol class="arabic">
+<li><p class="first">patches used:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">numpy</span><span class="o">.</span><span class="n">patch</span>
+<span class="n">scipy</span><span class="o">.</span><span class="n">patch</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">64 bit GCC toolchain:</p>
+<div class="highlight-python"><div class="highlight"><pre>amd64/
+    mingw-w64-toolchain-static_amd64-gcc-4.8.2_vc90_rev-20140131.7z
+    libpython27.a
+</pre></div>
+</div>
+<ol class="arabic">
+<li><p class="first">numpy-1.8.0 linked against OpenBLAS:</p>
+<div class="highlight-python"><div class="highlight"><pre>amd64/numpy-1.8.0/
+    numpy-1.8.0.win-amd64-py2.7.exe
+    numpy-1.8.0-cp27-none-win_amd64.whl
+    numpy_amd64_fcompiler.log
+    numpy_amd64_build.log
+    numpy_amd64_test.log
+    _numpyconfig.h
+    config.h
+</pre></div>
+</div>
+</li>
+<li><p class="first">scipy-0.13.3 linked against OpenBLAS:</p>
+<div class="highlight-python"><div class="highlight"><pre>amd64/scipy-0.13.3/
+    scipy-0.13.3.win-amd64-py2.7.exe
+    scipy-0.13.3-cp27-none-win_amd64.whl
+    scipy_amd64_fcompiler.log
+    scipy_amd64_build.log
+    scipy_amd64_build_cont.log
+    scipy_amd64_test._segfault.log
+    scipy_amd64_test.log
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+<li><p class="first">32 bit GCC toolchain:</p>
+<div class="highlight-python"><div class="highlight"><pre>win32/
+    mingw-w64-toolchain-static_win32-gcc-4.8.2_vc90_rev-20140131.7z
+    libpython27.a
+</pre></div>
+</div>
+<ol class="arabic">
+<li><p class="first">numpy-1.8.0 linked against OpenBLAS:</p>
+<div class="highlight-python"><div class="highlight"><pre>win32/numpy-1.8.0/
+    numpy-1.8.0.win32-py2.7.exe
+    numpy-1.8.0-cp27-none-win32.whl
+    numpy_win32_fcompiler.log
+    numpy_win32_build.log
+    numpy_win32_test.log
+    _numpyconfig.h
+    config.h
+</pre></div>
+</div>
+</li>
+<li><p class="first">scipy-0.13.3 linked against OpenBLAS:</p>
+<div class="highlight-python"><div class="highlight"><pre>win32/scipy-0.13.3/
+    scipy-0.13.3.win32-py2.7.exe
+    scipy-0.13.3-cp27-none-win32.whl
+    scipy_win32_fcompiler.log
+    scipy_win32_build.log
+    scipy_win32_build_cont.log
+    scipy_win32_test.log
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+</ol>
+</div>
+<div class="section" id="notes-for-the-distribution">
+<span id="notes"></span><h2>Notes for the distribution<a class="headerlink" href="#notes-for-the-distribution" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="libpython-import-files">
+<h3>libpython import files<a class="headerlink" href="#libpython-import-files" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">libpython27.a</span></code> import files have been generated with gendef and dlltool
+according to the recommendations on the mingw-w64 faq site. It is essential to
+not use import libraries from anywhere, but create it with the tools in the GCC
+toolchain. The GCC toolchains contains correct generated mscvrXX import files
+per default.</p>
+</div>
+<div class="section" id="openblas-files">
+<h3>OpenBLAS files<a class="headerlink" href="#openblas-files" title="Permalink to this headline">¶</a></h3>
+<p>The openblas DLL must be copied to numpy/core before building numpy. All Blas
+and Lapack code will be linked dynamically to this DLL.  Because of this the
+overall distro size gets much smaller compared to numpy-MKL or scipy-MKL. It is
+not necessary to add numpy/core to the path!  (at least on my machine). To load
+libopenblas.dll to the process space it is only necessary to import numpy -
+nothing else. libopenblas.dll is linked against the msvcr90.dll, just like
+python. The DLL itself is a fat binary containing all optimized kernels for all
+supported platforms. DLL, headers and import files have been included into the
+toolchain.</p>
+</div>
+</div>
+<div class="section" id="compiling-numpy-and-scipy">
+<h2>Compiling numpy and scipy<a class="headerlink" href="#compiling-numpy-and-scipy" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="compiling-numpy">
+<h3>Compiling numpy<a class="headerlink" href="#compiling-numpy" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">&lt;mingw&gt;bin and python should be in the PATH. Choose 32 bit or 64 bit architecture.</p>
+</li>
+<li><p class="first">copy libpython27.a to &lt;python&gt;libs check, that &lt;python&gt;libs does not
+contain libmsvcr90.a</p>
+</li>
+<li><p class="first">apply numpy.patch</p>
+</li>
+<li><p class="first">copy libopenblas.dll from &lt;mingw&gt;bin to numpycore of course don&#8217;t ever mix
+32bit and 64 bit code</p>
+</li>
+<li><p class="first">create a site.cfg in the numpy folder with the absolute path to the mingw
+import files/header files. I copied the openblas header files, importlibs
+into the GCC toolchain.</p>
+</li>
+<li><p class="first">create a mingw distutils.cfg file</p>
+</li>
+<li><p class="first">test the configuration:</p>
+<div class="highlight-python"><div class="highlight"><pre>python setup.py config_fc --verbose
+python setup.py build --help-fcompiler
+</pre></div>
+</div>
+</li>
+<li><p class="first">build:</p>
+<div class="highlight-python"><div class="highlight"><pre>python setup.py build --fcompiler=gnu95
+</pre></div>
+</div>
+</li>
+<li><p class="first">make a exe installer:</p>
+<div class="highlight-python"><div class="highlight"><pre>python setup.py bdist --format=wininst
+</pre></div>
+</div>
+</li>
+<li><p class="first">make a wheel:</p>
+<p>Example for built 32-bit exe installer:</p>
+<div class="highlight-python"><div class="highlight"><pre>wininst2wheel numpy-1.8.0.win32-py2.7.exe
+</pre></div>
+</div>
+</li>
+<li><p class="first">install:</p>
+<div class="highlight-python"><div class="highlight"><pre>wheel install numpy-1.8.0-cp27-none-win32.whl
+</pre></div>
+</div>
+</li>
+<li><p class="first">test:</p>
+<div class="highlight-python"><div class="highlight"><pre>python -c &#39;import numpy; numpy.test()&#39;
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="compiling-scipy">
+<h3>Compiling scipy<a class="headerlink" href="#compiling-scipy" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">apply scipy.patch</p>
+</li>
+<li><p class="first">Check fortran compiler with:</p>
+<div class="highlight-python"><div class="highlight"><pre>python setup.py build --fcompiler=gnu95
+</pre></div>
+</div>
+<p>and a second time:</p>
+<div class="highlight-python"><div class="highlight"><pre>python setup.py build --fcompiler=gnu95
+</pre></div>
+</div>
+</li>
+<li><p class="first">Build exe installer:</p>
+<div class="highlight-python"><div class="highlight"><pre>python setup.py bdist --format=wininst
+</pre></div>
+</div>
+</li>
+<li><p class="first">install</p>
+</li>
+<li><p class="first">test with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">scipy</span><span class="p">;</span> <span class="n">scipy</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="customizations-over-standard-mingw-builds-releases">
+<h2>Customizations over standard mingw-builds releases<a class="headerlink" href="#customizations-over-standard-mingw-builds-releases" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>two dedicated GCC toolchains for both 32bit (POSIX threads, Dwarf exceptions)
+and 64 bit (POSIX threads, SEH exceptions)</li>
+<li>statically build toolchain based on gcc-4.8.2 and mingw-w64 v 3.1.0</li>
+<li>languages: C, C++, gfortran, LTO</li>
+<li>customized &#8216;specs&#8217; file for MSVCR90 linkage and manifest support (MSVCR100 linkage coming soon)</li>
+<li>additional ftime64 patch to allow winpthreads and OpenMP to work with MSVCR90 linkage</li>
+<li>openblas-2.9rc1 with windows thread support (OpenMP disabled) included</li>
+</ul>
+</div>
+<div class="section" id="issues-to-consider">
+<h2>Issues to consider<a class="headerlink" href="#issues-to-consider" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>DLL deployment: mingw runtime DLLs can not be found at runtime. <em>Solution</em>:
+use flags for static linking or use a dedicated &#8216;static&#8217; GCC toolchain for
+compiling and linking. Both solutions should work.</li>
+<li>Win32 default stack alignment incompatibility: GCC uses 16 bytes since
+GCC4.6, MSVC uses 4 bytes. <em>Solution</em>: use the -mincoming-stack-boundary=2 flag
+for compiling. Win64 X86_64 is not affected. This issue is the major cause
+for segment faults on 32bit systems.</li>
+<li>Import library problem: numpy distutils does not play well with mingw-w64
+<em>Solution</em>: create a Python <code class="docutils literal"><span class="pre">libpython27.a</span></code> import library with the
+mingw-w64 tools. Use a patched numpy distutils (see <code class="docutils literal"><span class="pre">numpy.patch</span></code> above).</li>
+<li>Linking against the correct msvcrXXX Version.  <em>Solution</em>: create a &#8216;specs&#8217;
+file (howto see <a class="reference external" href="http://www.mingw.org/wiki/HOWTO_Use_the_GCC_specs_file">http://www.mingw.org/wiki/HOWTO_Use_the_GCC_specs_file</a> ) that
+includes necessary informations.</li>
+<li>manifest resources <em>Solution</em>: extend the GCC toolchain with the Manifest
+resource files and ensure linkage with the help of the &#8216;specs&#8217; file.</li>
+<li>Blas Lapack for numpy scipy There is no silver bullet! A trade-off between
+licence acceptance, performance and stability remains to be found. OpenBLAS
+on Win32 seems to be quite stable. Some OpenBLAS issues on Win64 can be
+adressed with a single threaded version of that library.</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Mingw static toolchain</a><ul>
+<li><a class="reference internal" href="#what-is-a-static-gcc-toolchain">What is a static GCC toolchain?</a></li>
+<li><a class="reference internal" href="#where-is-it">Where is it?</a></li>
+<li><a class="reference internal" href="#what-s-in-it">What&#8217;s in it?</a></li>
+<li><a class="reference internal" href="#notes-for-the-distribution">Notes for the distribution</a><ul>
+<li><a class="reference internal" href="#libpython-import-files">libpython import files</a></li>
+<li><a class="reference internal" href="#openblas-files">OpenBLAS files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#compiling-numpy-and-scipy">Compiling numpy and scipy</a><ul>
+<li><a class="reference internal" href="#compiling-numpy">Compiling numpy</a></li>
+<li><a class="reference internal" href="#compiling-scipy">Compiling scipy</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#customizations-over-standard-mingw-builds-releases">Customizations over standard mingw-builds releases</a></li>
+<li><a class="reference internal" href="#issues-to-consider">Issues to consider</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Mingw-static-toolchain.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Carl Kleffner and collaborators.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/Mingw-static-toolchain.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
