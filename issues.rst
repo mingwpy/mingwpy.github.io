@@ -1,0 +1,157 @@
+######
+Issues
+######
+
+******************************
+MS / gcc ABI incompatibilities
+******************************
+
+``-mincoming-stack-boundary=2``
+
+Problem may be that MSVC on 32-bits only guarantees 4 (2^2) byte code
+alignment, whereas gcc can assume 16 (2^4) byte stack alignment.
+
+From:
+https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs
+
+    Stack alignment discussion: GCC upstream agrees the default should be
+    compatible with MSVC, however it’s not. GCC will likely not accept a patch
+    to go back to the pre-4.6 stack alignment. Needs follow-up with Kai Tietz
+    (he asked for a test case). Note: 32-bit only problem.
+
+**********************
+Choice of MSVC runtime
+**********************
+
+All code in a single process should use one single version of the MSVC runtime
+(see `MSDN article
+<https://msdn.microsoft.com/en-us/library/ms235460.aspx>`_).
+
+The Python that gets installed from downloading from https://python.org is
+build with MSVC.  Therefore Python extensions for Python installed from these
+installers must use the same MSVC CRT.
+
+Specifically (see: `Python and MSVC versions
+<https://matthew-brett.github.io/pydagogue/python_msvc.html#visual-studio-versions-used-to-compile-distributed-python-binaries>`_):
+
+============== ============ =========
+Python version VC++ version C runtime
+============== ============ =========
+2.7.6          9.0 / 2008   MSVCR90.DLL
+3.2.3          9.0 / 2008   MSVCR90.DLL
+3.3.5          10.0 / 2010  MSVCR100.DLL
+3.4.0          10.0 / 2010  MSVCR100.DLL
+3.5.0          14.0 / 2015  UCRTBASE.DLL / VCRUNTIME140.DLL
+============== ============ =========
+
+By default, mingw-w64 links to the MSVCRT.DLL.  This is a CRT dating from MSVC
+4.2, but updated to contain the runtimes for MSVC 6.0, plus some more recent
+(>6.0) API calls (see these comments on `using MSVCRT.DLL from Mingw-w64
+<http://sourceforge.net/p/mingw-w64/wiki2/The%20case%20against%20msvcrt.dll>`_).
+
+It is possible, using `spec files
+<http://www.mingw.org/wiki/HOWTO_Use_the_GCC_specs_file>`_, to ask mingw-w64
+to link to other versions of the MSVC runtimes.  This could induce bad
+behavior if there is any API mismatch between the implementations in the
+mingw-w64 headers (tuned to MSVCRT.DLL) and those in the newer C runtime.
+
+What workarounds are necessary to use MSVC 9.0 / 2008 (Python 2.7)?
+
+************************
+The VS 14 / 2015 runtime
+************************
+
+Matters get more confusing for the latest (at time of writing) MSVC, version
+14 (MSVS 2015).
+
+Firstly, the CRT is now two files:
+
+* ``ucrtbase.dll``;
+* ``vcruntime140.dll``;
+
+of which the first will be keep a stable API / ABI across new VS releases.
+
+Second, linking correctly to these new 2015 libraries requires careful choice
+of the DLL import library.
+
+(Quoting Nathaniel Smith on email):
+
+    The good news though is that I think we actually do know how to do this --
+    basically it's just, instead of linking directly to ucrtbase.dll, there
+    are 15 "interface dlls" that export the various CRT symbols, so one has to
+    link to the needed ones directly. (This is based on my fiddling around
+    with the UCRT SDK, and Kai has apparently come to a similar conclusion.)
+    So it'd be good to ask MS to confirm, but I'm ~90% sure this is right.
+
+    Symbols and DLLs:
+        https://gist.github.com/njsmith/08b1e52b65ea90427bfd
+
+*********************
+Math precision issues
+*********************
+
+(Quoting Nathaniel Smith on email):
+
+    mingw-w64's libm implementations are the borrowed from those used on BSDs,
+    Linux, etc., and assume -- consistent with the ABI on those other
+    platforms -- that the x87 FPU will be configured to use 80 bit precision
+    for intermediate results. MSVC's ABI, though, configures the x87 FPU into
+    64 bit precision mode, and we don't want to override that because who
+    knows what would break.  The result is that when run in MSVC-compatibility
+    mode, mingw-w64's libm code currently assumes that it has higher internal
+    precision than it actually has, and doesn't necessarily produce the right
+    answers. In particular the trig functions currently are just thin wrappers
+    around the x87 fsin / fcos / etc. instructions. These are pretty sloppy
+    and inaccurate, which doesn't matter too much if you're going to throw
+    away all the low-order bits anyway... but if you're going to keep those
+    bits then it becomes more of an issue.
+
+    [...]
+
+Investigating ``sleef`` library for needed functions.  Nathaniel suggested
+libm implementation from bionic (Android's libc).
+
+***************
+Disutils issues
+***************
+
+How to return correct flags to mingw-w64, from Python built with MSVC?
+
+***********************
+BLAS / LAPACK libraries
+***********************
+
+Problems with OpenBLAS.
+
+A small number of test failures with numpy / scipy.
+
+ATLAS instead?
+
+MKL licensing appears to still require us (the wheel package authors) to
+require you (the wheel package users) not to reverse engineer the MKL
+binaries (an extra license restriction).  Package authors have to indemnify
+Intel against being sued by the package users.
+
+******************
+Partial to-do list
+******************
+
+* Implement linking to MSVC 2015 CRT libraries from mingw-w64;
+
+  * work out correct method;
+  * discuss with MS developers;
+  * merge to mingw-w64;
+
+* Implement high-precision libm;
+
+  * decide on library;
+  * merge to mingw-w64;
+
+* Develop "runtime agility" for mingw-w64 - method of adapting to different
+  MSVC CRT libraries dynamically.  Maybe 50-60K of developer work / 2 man
+  months.  On back-burner for mingw-w64 project.
+
+* Create buildbot / appveyor scripts to build mingwpy library;
+
+* Create test rig for OpenBLAS maybe via numpy, implement on buildbots with
+  different processors or gcc compile farm.
