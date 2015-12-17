@@ -18,7 +18,7 @@ https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs
     compatible with MSVC, however it’s not. GCC will likely not accept a patch
     to go back to the pre-4.6 stack alignment. Needs follow-up with Kai Tietz
     (he asked for a test case). Note: 32-bit only problem.
-
+    
 Some googling suggests that the case where this problem will arise specifically
 is when you combine functions that contain SSE instructions (which are less
 forgiving of bad alignment than most of the x86 ISA), then called from code
