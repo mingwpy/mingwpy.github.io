@@ -27,6 +27,8 @@ this tends to happen with windows threads. This is consistent with the
 observation that OpenBLAS in particular blows up without this flag (b/c
 OpenBLAS is a heavy user of SSE + threads).
 
+(See: `1 <http://www.peterstock.co.uk/games/mingw_sse/>`_, `2 <http://www.sourceware.org/ml/pthreads-win32/2008/msg00056.html>`_)
+
 **********************
 Choice of MSVC runtime
 **********************
