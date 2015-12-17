@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
-    <link rel="next" title="README for mingwpy.github.io" href="README.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
     <link rel="prev" title="The Mingwpy project" href="index.html" />
    
   
@@ -53,6 +53,14 @@ alignment, whereas gcc can assume 16 (2^4) byte stack alignment.</p>
 compatible with MSVC, however it’s not. GCC will likely not accept a patch
 to go back to the pre-4.6 stack alignment. Needs follow-up with Kai Tietz
 (he asked for a test case). Note: 32-bit only problem.</div></blockquote>
+<p>Some googling suggests that the case where this problem will arise specifically
+is when you combine functions that contain SSE instructions (which are less
+forgiving of bad alignment than most of the x86 ISA), then called from code
+that doesn&#8217;t guarantee the right stack alignment &#8211; online hints suggest that
+this tends to happen with windows threads. This is consistent with the
+observation that OpenBLAS in particular blows up without this flag (b/c
+OpenBLAS is a heavy user of SSE + threads).</p>
+<p>(See: <a class="reference external" href="http://www.peterstock.co.uk/games/mingw_sse/">1</a>, <a class="reference external" href="http://www.sourceware.org/ml/pthreads-win32/2008/msg00056.html">2</a>)</p>
 </div>
 <div class="section" id="choice-of-msvc-runtime">
 <h2>Choice of MSVC runtime<a class="headerlink" href="#choice-of-msvc-runtime" title="Permalink to this headline">¶</a></h2>
@@ -153,6 +161,9 @@ bits then it becomes more of an issue.</p>
 </div></blockquote>
 <p>Investigating <code class="docutils literal"><span class="pre">sleef</span></code> library for needed functions.  Nathaniel suggested
 libm implementation from bionic (Android&#8217;s libc).</p>
+<p>Bionic&#8217;s libm is here: <a class="reference external" href="https://github.com/android/platform_bionic/tree/master/libm/x86">https://github.com/android/platform_bionic/tree/master/libm/x86</a>
+Basically what would be needed is just copying these files into mingw-w64 plus
+build system updates.</p>
 </div>
 <div class="section" id="disutils-issues">
 <h2>Disutils issues<a class="headerlink" href="#disutils-issues" title="Permalink to this headline">¶</a></h2>
@@ -216,7 +227,7 @@ different processors or gcc compile farm.</li>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">The Mingwpy project</a></li>
-      <li>Next: <a href="README.html" title="next chapter">README for mingwpy.github.io</a></li>
+      <li>Next: <a href="glossary.html" title="next chapter">Glossary</a></li>
   </ul></li>
 </ul>
 </div>
