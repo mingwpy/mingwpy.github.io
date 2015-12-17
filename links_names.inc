@@ -6,6 +6,12 @@
 .. _restructuredtext: http://docutils.sourceforge.net/rst.html
 .. _ghp-import: https://pypi.python.org/pypi/ghp-import
 
+.. Related pages
+.. _numerical software on Windows:
+   https://github.com/numpy/numpy/wiki/Numerical-software-on-Windows
+.. _fortran on Windows:
+   https://github.com/numpy/numpy/wiki/Numerical-software-on-Windows#fortran
+
 .. Python and common libraries
 .. _python: https://www.python.org
 .. _python.org releases: https://www.python.org/download/releases
