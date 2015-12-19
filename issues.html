@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
-    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="next" title="Mingwpy distribution" href="mingwpy.html" />
     <link rel="prev" title="Background" href="background.html" />
    
   
@@ -41,11 +41,39 @@
             
   <div class="section" id="issues">
 <h1>Issues<a class="headerlink" href="#issues" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="finding-the-mingw-w64-runtime-library-code">
+<h2>Finding the mingw-w64 runtime library code<a class="headerlink" href="#finding-the-mingw-w64-runtime-library-code" title="Permalink to this headline">¶</a></h2>
+<p>It is difficult to guarantee that a compiled Python extension will be able to
+find the correct version of runtime DLLs – see: <a class="reference external" href="https://github.com/numpy/numpy/wiki/windows-dll-notes">Windows DLL notes</a>.</p>
+<p>One method to avoid this problem is to include any necessary runtime code in
+the compiled extension.  This can be done by:</p>
+<ul class="simple">
+<li>Compiling all extensions (DLLs) with <code class="docutils literal"><span class="pre">-static-libgcc</span></code>,
+<code class="docutils literal"><span class="pre">-static-libstdc++</span></code> etc flags;</li>
+<li>Using a gcc compiler toolchain that does static linking to runtimes by
+default.  This is a &#8220;static toolchain&#8221;.  The <a class="reference external" href="https://github.com/niXman/mingw-builds">mingw-builds</a> set of scripts
+builds such a toolchain by passing the <code class="docutils literal"><span class="pre">--static-gcc</span></code> argument (see:
+<a class="reference external" href="https://github.com/niXman/mingw-builds/blob/17ae841dcf6e72badad7941a06d631edaf687436/build#L218">mingw-build build file</a>;</li>
+</ul>
+<p>Using these approaches, all the necessary object code from the GCC runtimes
+will be statically linked into the binaries. As a consequence the binary size
+will be increased in comparison to the standard toolchains / dynamic linking.
+The advantage is, that there will be no dependency to external GCC runtime
+libraries, so the deployment of Python extensions is greatly improved.</p>
+<p>However, exception heavy C++ programs such as QT should be compiled with
+shared runtimes to avoid problems with exception handling over DLL boundaries.</p>
+<p>For building typically Python extensions a customized static GCC toolchain is
+the best compromise IMHO.</p>
+</div>
 <div class="section" id="ms-gcc-abi-incompatibilities">
 <h2>MS / gcc ABI incompatibilities<a class="headerlink" href="#ms-gcc-abi-incompatibilities" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></code></p>
-<p>Problem may be that MSVC on 32-bits only guarantees 4 (2^2) byte code
-alignment, whereas gcc can assume 16 (2^4) byte stack alignment.</p>
+<p>There is a win32 default stack alignment incompatibility: GCC code provides
+(and assumes) 16 (2^4) byte stack alignment since GCC4.6, but MSVC uses 4
+(2^2) byte stack alignment.</p>
+<p>Win64 X86_64 is not affected.  This issue is the major cause for segment
+faults on 32bit systems.</p>
+<p>The solution* is to use the <code class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></code> flag for
+compiling.</p>
 <p>From:
 <a class="reference external" href="https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs">https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs</a></p>
 <blockquote>
@@ -308,13 +336,29 @@ build system updates.</p>
 </div>
 <div class="section" id="disutils-issues">
 <h2>Disutils issues<a class="headerlink" href="#disutils-issues" title="Permalink to this headline">¶</a></h2>
+<p>Mingw via Python distutils needs to link extension code to the correct Python
+library, e.g. <code class="docutils literal"><span class="pre">libpython27.dll</span></code>.  To do this, mingw needs a library
+definition file <code class="docutils literal"><span class="pre">libpython27.a</span></code>.  It is possible to create this file using
+the mingw-w64 tools.</p>
+<p>numpy distutils currently needs patching to pass correct flags to compiler /
+linkg.</p>
 <p>How to return correct flags to mingw-w64, from Python built with MSVC?</p>
+</div>
+<div class="section" id="manifest-resources">
+<h2>Manifest resources<a class="headerlink" href="#manifest-resources" title="Permalink to this headline">¶</a></h2>
+<p>Solution is to extend the GCC toolchain with the Manifest resource files and
+ensure linkage with the help of the &#8216;specs&#8217; file.</p>
 </div>
 <div class="section" id="blas-lapack-libraries">
 <h2>BLAS / LAPACK libraries<a class="headerlink" href="#blas-lapack-libraries" title="Permalink to this headline">¶</a></h2>
+<p>There is no silver bullet for the problem of finding fast, reliable BLAS and
+LAPACK routines with a suitable license. ! A trade-off between licence
+acceptance, performance and stability remains to be found. OpenBLAS on Win32
+seems to be quite stable. Some OpenBLAS issues on Win64 can be adressed with a
+single threaded version of that library.</p>
 <p>Problems with OpenBLAS.</p>
 <p>A small number of test failures with numpy / scipy.</p>
-<p>ATLAS instead?</p>
+<p>Consider ATLAS instead?</p>
 <p>MKL licensing appears to still require us (the wheel package authors) to
 require you (the wheel package users) not to reverse engineer the MKL
 binaries (an extra license restriction).  Package authors have to indemnify
@@ -353,11 +397,13 @@ different processors or gcc compile farm.</li>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Issues</a><ul>
+<li><a class="reference internal" href="#finding-the-mingw-w64-runtime-library-code">Finding the mingw-w64 runtime library code</a></li>
 <li><a class="reference internal" href="#ms-gcc-abi-incompatibilities">MS / gcc ABI incompatibilities</a></li>
 <li><a class="reference internal" href="#choice-of-msvc-runtime">Choice of MSVC runtime</a></li>
 <li><a class="reference internal" href="#the-vs-14-2015-runtime">The VS 14 / 2015 runtime</a></li>
 <li><a class="reference internal" href="#math-precision-issues">Math precision issues</a></li>
 <li><a class="reference internal" href="#disutils-issues">Disutils issues</a></li>
+<li><a class="reference internal" href="#manifest-resources">Manifest resources</a></li>
 <li><a class="reference internal" href="#blas-lapack-libraries">BLAS / LAPACK libraries</a></li>
 <li><a class="reference internal" href="#partial-to-do-list">Partial to-do list</a></li>
 </ul>
@@ -368,7 +414,7 @@ different processors or gcc compile farm.</li>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="background.html" title="previous chapter">Background</a></li>
-      <li>Next: <a href="glossary.html" title="next chapter">Glossary</a></li>
+      <li>Next: <a href="mingwpy.html" title="next chapter">Mingwpy distribution</a></li>
   </ul></li>
 </ul>
 </div>
