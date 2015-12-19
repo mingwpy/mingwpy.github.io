@@ -1,6 +1,26 @@
 .. Links and substitutions that might be shared across pages
 .. vim: ft=rst
 
+.. Mingw etc
+.. _mingw-w64 history:
+   http://sourceforge.net/p/mingw-w64/wiki2/History
+.. _mingw-w64 source releases:
+   http://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/
+.. _mingw wikipedia page: https://en.wikipedia.org/wiki/MinGW
+.. _mingw-w64 wikipedia section: https://en.wikipedia.org/wiki/MinGW#MinGW-w64
+.. _mingw-builds: https://github.com/niXman/mingw-builds
+.. _msys2: http://sourceforge.net/projects/msys2/
+.. _mingw-w64 exception handling:
+   http://sourceforge.net/p/mingw-w64/wiki2/Exception%20Handling/
+.. _SO post on mingw-w64 exception handling:
+   http://stackoverflow.com/questions/15670169/what-is-difference-between-sjlj-vs-dwarf-vs-seh
+
+.. Windows
+.. _PE format:
+.. _Portable executable format:
+.. _Portable executable:
+.. _PE: https://en.wikipedia.org/wiki/Portable_Executable
+
 .. Documentation
 .. _sphinx: http://sphinx-doc.org
 .. _restructuredtext: http://docutils.sourceforge.net/rst.html
@@ -44,6 +64,8 @@
 .. _table of MSVC versions and CRTs:
    https://matthew-brett.github.io/pydagogue/python_msvc.html#visual-studio-compiler-versions
 .. _glibc: https://www.gnu.org/software/libc
+.. _binutils: http://www.gnu.org/software/binutils
+.. _binutils wikipedia page: https://en.wikipedia.org/wiki/GNU_Binutils
 
 .. Licenses
 .. _CC0 license: http://creativecommons.org/publicdomain/zero/1.0/legalcode
