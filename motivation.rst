@@ -40,6 +40,15 @@ To our knowledge, the only freely-available Fortran compilers on Windows are
 those from the :term:`gcc`, and specifically, ``g77`` / ``gfortran`` from
 :term:`mingw` and :term:`mingw-w64`.
 
+*******************************************************************
+High performance numerical kernels aren't written with MSVS in mind
+*******************************************************************
+
+All of the competitive open-source linear algebra libraries
+(e.g. OpenBLAS) contain crucial chunks of assembly language code, and
+this code is written using gcc conventions that aren't supported by
+MSVS.
+
 ***********************************************
 Open-source depends on free access to compilers
 ***********************************************
