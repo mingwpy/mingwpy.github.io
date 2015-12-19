@@ -20,6 +20,8 @@
 .. _Portable executable format:
 .. _Portable executable:
 .. _PE: https://en.wikipedia.org/wiki/Portable_Executable
+.. _Structured exception handling:
+.. _SEH: https://www.microsoft.com/msj/0197/exception/exception.aspx
 
 .. Documentation
 .. _sphinx: http://sphinx-doc.org
