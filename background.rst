@@ -77,11 +77,14 @@ exception handling`_ for background.
 
 The exception handling modes are:
 
-* Dwarf2: only supported on 32-bit Windows;
+* Dwarf2: only supported building for 32-bit Windows targets;
 * setjmp / longjmp (SJLJ): "much slower than Dwarf2", but compatible on 32 and
   64 bits;
-* Structured exception handling (SEH): see: `SEH and Mingw
-  <http://www.programmingunlimited.net/siteexec/content.cgi?page=mingw-seh>`_
+* `Structured exception handling`_ (SEH): the standard MSVC exception handling
+  mechanism, `supported in 64-bit GCC since version 4.8
+  <http://thread.gmane.org/gmane.comp.gnu.mingw.w64.general/5920>`_.  SEH
+  `still not supported <http://mingw-w64.org/doku.php/contribute>`_ for 32-bit
+  targets.
 
 ****************
 Threading models
@@ -120,8 +123,10 @@ Official mingw-w64 GCC toolchains
 'recommended' builds are available from the mingw-builds project at
 http://mingw-w64.sourceforge.net/download.php#mingw-builds for example:
 
-- http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/
-- http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.2/threads-posix/dwarf/
+- `64-bit target, SEH exceptions, posix threads
+  <http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh>`_
+- `32-bit target, dwarf 2 exceptions, posix threads
+  <http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.2/threads-posix/dwarf>`_
 
 These are common combinations of exception and thread models. You can find
 other combinations as well. Exception handling affects C++ development. Don't
@@ -142,6 +147,8 @@ patches are available from archlinux as well as from the msys2 maintainers.
 
 - http://sourceforge.net/projects/mingw-w64-archlinux/files/  (i686: Sjlj | x86_64: SEH)
 - http://sourceforge.net/projects/msys2/files/REPOS/MINGW/  (i686: Dwarf | x86_64: SEH)
+
+See also `this mingw-w64 writeup for Qt <http://wiki.qt.io/MinGW-64-bit>`_.
 
 ***************************************************
 Building a mingw-w64 based GCC toolchain on Windows
