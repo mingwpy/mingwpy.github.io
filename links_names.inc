@@ -14,6 +14,9 @@
    http://sourceforge.net/p/mingw-w64/wiki2/Exception%20Handling/
 .. _SO post on mingw-w64 exception handling:
    http://stackoverflow.com/questions/15670169/what-is-difference-between-sjlj-vs-dwarf-vs-seh
+.. _mingwpy bitbucket repo:
+   https://bitbucket.org/carlkl/mingw-w64-for-python/downloads
+.. _mingwpy anaconda site: https://anaconda.org/carlkl/mingwpy
 
 .. Windows
 .. _PE format:
@@ -22,6 +25,7 @@
 .. _PE: https://en.wikipedia.org/wiki/Portable_Executable
 .. _Structured exception handling:
 .. _SEH: https://www.microsoft.com/msj/0197/exception/exception.aspx
+.. _Windows DLL notes: https://github.com/numpy/numpy/wiki/windows-dll-notes
 
 .. Documentation
 .. _sphinx: http://sphinx-doc.org

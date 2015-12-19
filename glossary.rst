@@ -53,4 +53,11 @@ Glossary
         archives of compiler object files).  See also the `binutils wikipedia
         page`_.
 
+
+    LTO
+    Link-time optimization
+        See: `GCC LTO <https://gcc.gnu.org/wiki/LinkTimeOptimization>`_;
+        `interprocedural optimization
+        <https://en.wikipedia.org/wiki/Interprocedural_optimization>`_.
+
 .. include:: links_names.inc

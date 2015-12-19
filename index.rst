@@ -17,11 +17,12 @@ Contents
 ********
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     motivation
     background
     issues
+    mingwpy
     glossary
 
 .. hidden toctree suppresses warnings about not-included documents
