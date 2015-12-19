@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
-    <link rel="next" title="Issues" href="issues.html" />
+    <link rel="next" title="Background" href="background.html" />
     <link rel="prev" title="The Mingwpy project" href="index.html" />
    
   
@@ -69,6 +69,13 @@ or another Python package with Fortran code will need a compiler other than
 those from the <a class="reference internal" href="glossary.html#term-gcc"><span class="xref std std-term">gcc</span></a>, and specifically, <code class="docutils literal"><span class="pre">g77</span></code> / <code class="docutils literal"><span class="pre">gfortran</span></code> from
 <a class="reference internal" href="glossary.html#term-mingw"><span class="xref std std-term">mingw</span></a> and <a class="reference internal" href="glossary.html#term-mingw-w64"><span class="xref std std-term">mingw-w64</span></a>.</p>
 </div>
+<div class="section" id="high-performance-numerical-kernels-aren-t-written-with-msvs-in-mind">
+<h2>High performance numerical kernels aren&#8217;t written with MSVS in mind<a class="headerlink" href="#high-performance-numerical-kernels-aren-t-written-with-msvs-in-mind" title="Permalink to this headline">¶</a></h2>
+<p>All of the competitive open-source linear algebra libraries
+(e.g. OpenBLAS) contain crucial chunks of assembly language code, and
+this code is written using gcc conventions that aren&#8217;t supported by
+MSVS.</p>
+</div>
 <div class="section" id="open-source-depends-on-free-access-to-compilers">
 <h2>Open-source depends on free access to compilers<a class="headerlink" href="#open-source-depends-on-free-access-to-compilers" title="Permalink to this headline">¶</a></h2>
 <p>Open source works by spreading the work of maintaining and distributing
@@ -103,6 +110,7 @@ software.</p>
 <li><a class="reference internal" href="#">Why mingwpy?</a><ul>
 <li><a class="reference internal" href="#msvs-can-be-painful-to-install-and-configure">MSVS can be painful to install and configure</a></li>
 <li><a class="reference internal" href="#scientific-software-often-needs-a-fortran-compiler">Scientific software often needs a Fortran compiler</a></li>
+<li><a class="reference internal" href="#high-performance-numerical-kernels-aren-t-written-with-msvs-in-mind">High performance numerical kernels aren&#8217;t written with MSVS in mind</a></li>
 <li><a class="reference internal" href="#open-source-depends-on-free-access-to-compilers">Open-source depends on free access to compilers</a></li>
 <li><a class="reference internal" href="#cross-platform-tools-make-for-easier-maintenance">Cross-platform tools make for easier maintenance</a></li>
 <li><a class="reference internal" href="#open-source-programmers-prefer-open-source-tools">Open-source programmers prefer open-source tools</a></li>
@@ -114,7 +122,7 @@ software.</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">The Mingwpy project</a></li>
-      <li>Next: <a href="issues.html" title="next chapter">Issues</a></li>
+      <li>Next: <a href="background.html" title="next chapter">Background</a></li>
   </ul></li>
 </ul>
 </div>

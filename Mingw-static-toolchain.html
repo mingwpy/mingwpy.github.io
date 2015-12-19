@@ -41,17 +41,17 @@
 <h1>Mingw static toolchain<a class="headerlink" href="#mingw-static-toolchain" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="what-is-a-static-gcc-toolchain">
 <h2>What is a static GCC toolchain?<a class="headerlink" href="#what-is-a-static-gcc-toolchain" title="Permalink to this headline">¶</a></h2>
-<p>GCC as well as the all necessary libraries for a toolchain can be compiled with
-&#8220;-disabled-shared&#8221;. This is supported by the mingw-builds scripts as an option.
-All the necessary object code from the GCC runtimes will be statically linked
-into the binaries. As a consequence the binary size will be increased in
-comparison to the standard toolchains. The advantage is, that there will be no
-dependency to external GCC runtime libraries, so the deployment of python
-extensions is greatly improved. Using such a toolchain is more reliable than
-using -static-XXX flags.  However, exception heavy C++ programs (i.e. QT)
-should be compiled with shared runtimes to avoid  problems with exceptions
-handling over DLL boundaries.  For building typically Python extensions a
-customized static GCC toolchain is the best compromise IMHO.</p>
+<p>GCC as well as the all necessary libraries for a toolchain can be compiled
+with &#8220;-disabled-shared&#8221;. This is supported by the mingw-builds scripts as an
+option.  All the necessary object code from the GCC runtimes will be
+statically linked into the binaries. As a consequence the binary size will be
+increased in comparison to the standard toolchains. The advantage is, that
+there will be no dependency to external GCC runtime libraries, so the
+deployment of python extensions is greatly improved. Using such a toolchain is
+more reliable than using -static-XXX flags.  However, exception heavy C++
+programs (i.e. QT) should be compiled with shared runtimes to avoid  problems
+with exceptions handling over DLL boundaries.  For building typically Python
+extensions a customized static GCC toolchain is the best compromise IMHO.</p>
 </div>
 <div class="section" id="where-is-it">
 <h2>Where is it?<a class="headerlink" href="#where-is-it" title="Permalink to this headline">¶</a></h2>

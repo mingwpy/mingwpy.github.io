@@ -42,6 +42,11 @@
   <div class="section" id="glossary">
 <h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
 <dl class="glossary docutils">
+<dt id="term-runtime-library">runtime library</dt>
+<dd>Library implementing routines to allow compiled code to interact with
+the runtime environment, such as the operating system.  For example
+the implementation of <code class="docutils literal"><span class="pre">malloc</span></code> and friends belongs in the compiler
+runtime library.</dd>
 <dt id="term-msvc"><span id="term-microsoft-visual-c"></span>MSVC<br />Microsoft Visual C++</dt>
 <dd>The Microsoft standard C / C++ compiler. Part of <a class="reference internal" href="#term-microsoft-visual-studio"><span class="xref std std-term">Microsoft
 Visual Studio</span></a>.</dd>
@@ -53,20 +58,28 @@ an IDE.</dd>
 <dd><a class="reference external" href="https://en.wikipedia.org/wiki/GNU_Compiler_Collection&gt;`_">GNU compiler collection</a> When we mean the C or C++ compiler
 specifically, we write &#8220;gcc c&#8221; or &#8220;gcc c++&#8221;.</dd>
 <dt id="term-mscrt">MSCRT</dt>
-<dd>Microsoft C runtime library - see <a class="reference external" href="https://en.wikipedia.org/wiki/Microsoft_Windows_library_files#Runtime_libraries">MS runtime libraries</a>
-and <a class="reference external" href="https://matthew-brett.github.io/pydagogue/python_msvc.html#visual-studio-compiler-versions">table of MSVC versions and CRTs</a>.</dd>
+<dd>Microsoft C <a class="reference internal" href="#term-runtime-library"><span class="xref std std-term">runtime library</span></a> - see <a class="reference external" href="https://en.wikipedia.org/wiki/Microsoft_Windows_library_files#Runtime_libraries">MS runtime libraries</a> and
+<a class="reference external" href="https://matthew-brett.github.io/pydagogue/python_msvc.html#visual-studio-compiler-versions">table of MSVC versions and CRTs</a>.</dd>
 <dt id="term-glibc">glibc</dt>
 <dd>The <a class="reference external" href="https://www.gnu.org/software/libc">GNU C runtime library</a></dd>
 <dt id="term-mingw">mingw</dt>
 <dd><a class="reference external" href="http://mingw.org">mingw</a>: &#8220;a contraction of &#8216;Minimalist GNU for Windows&#8217;, is a
 minimalist development environment for native Microsoft Windows
 applications.  It is a port of gcc to Windows that links against the
-MSCRT rather than the gcc libc.&#8221;.</dd>
+MSCRT rather than the gcc libc.&#8221;.  Also see the <a class="reference external" href="https://en.wikipedia.org/wiki/MinGW">mingw wikipedia
+page</a>.</dd>
 <dt id="term-mingw-w64">mingw-w64</dt>
 <dd><a class="reference external" href="http://mingw-w64.org">mingw-w64</a>: &#8220;Mingw-w64 is an advancement of the original mingw.org
 project, created to support the GCC compiler on Windows systems. It
 has forked it in 2007 in order to provide support for 64 bits and new
-APIs.&#8221;</dd>
+APIs.&#8221;  See: <a class="reference external" href="http://sourceforge.net/p/mingw-w64/wiki2/History">mingw-w64 history</a> and the <a class="reference external" href="https://en.wikipedia.org/wiki/MinGW#MinGW-w64">mingw-w64 wikipedia
+section</a>.</dd>
+<dt id="term-binutils">binutils</dt>
+<dd>GNU <a class="reference external" href="http://www.gnu.org/software/binutils">binutils</a>: a set of tools to work with compiler output, such as:
+<code class="docutils literal"><span class="pre">ld</span></code> (the GNU linker); <code class="docutils literal"><span class="pre">as</span></code> (the GNU assembler); <code class="docutils literal"><span class="pre">dlltool</span></code>
+(makes files for building and working with DLLs); <code class="docutils literal"><span class="pre">ar</span></code> (works with
+archives of compiler object files).  See also the <a class="reference external" href="https://en.wikipedia.org/wiki/GNU_Binutils">binutils wikipedia
+page</a>.</dd>
 </dl>
 </div>
 

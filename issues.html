@@ -26,7 +26,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
     <link rel="next" title="Glossary" href="glossary.html" />
-    <link rel="prev" title="The Mingwpy project" href="index.html" />
+    <link rel="prev" title="Background" href="background.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -61,6 +61,22 @@ this tends to happen with windows threads. This is consistent with the
 observation that OpenBLAS in particular blows up without this flag (b/c
 OpenBLAS is a heavy user of SSE + threads).</p>
 <p>(See: <a class="reference external" href="http://www.peterstock.co.uk/games/mingw_sse/">1</a>, <a class="reference external" href="http://www.sourceware.org/ml/pthreads-win32/2008/msg00056.html">2</a>)</p>
+<p>It&#8217;s likely that a sufficient test case to give to Kai would be a
+program that spawns a bunch of threads running the following
+function:</p>
+<div class="highlight-python"><div class="highlight"><pre>DWORD WINAPI thread(LPVOID param) {
+    int x;
+    intptr_t address = (intptr_t) &amp;x;
+    if (address % 16 != 0) {
+        printf(&quot;Thread stack %p is not 16-byte aligned!\n&quot;, &amp;x);
+    }
+    sleep(10);
+}
+</pre></div>
+</div>
+<p>and if this prints any output then we have our proof that
+<code class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></code> is necessary for Windows/MSVC
+compatibility.</p>
 </div>
 <div class="section" id="choice-of-msvc-runtime">
 <h2>Choice of MSVC runtime<a class="headerlink" href="#choice-of-msvc-runtime" title="Permalink to this headline">¶</a></h2>
@@ -139,6 +155,131 @@ So it&#8217;d be good to ask MS to confirm, but I&#8217;m ~90% sure this is righ
 <dd><a class="reference external" href="https://gist.github.com/njsmith/08b1e52b65ea90427bfd">https://gist.github.com/njsmith/08b1e52b65ea90427bfd</a></dd>
 </dl>
 </div></blockquote>
+<p>99% of the things we care about are in the safe unversioned
+<code class="docutils literal"><span class="pre">ucrtbase.dll</span></code>. There remains some question of what to do with
+<code class="docutils literal"><span class="pre">vcruntime140.dll</span></code>. The ideal would be that our toolchain simply
+doesn&#8217;t link to it at all. It looks like the symbols it provides are:</p>
+<div class="highlight-python"><div class="highlight"><pre>[Ordinal/Name Pointer] Table
+      [   0] _CreateFrameInfo
+      [   1] _CxxThrowException
+      [   2] _FindAndUnlinkFrame
+      [   3] _IsExceptionObjectToBeDestroyed
+      [   4] _SetWinRTOutOfMemoryExceptionCallback
+      [   5] __AdjustPointer
+      [   6] __BuildCatchObject
+      [   7] __BuildCatchObjectHelper
+      [   8] __C_specific_handler
+      [   9] __C_specific_handler_noexcept
+      [  10] __CxxDetectRethrow
+      [  11] __CxxExceptionFilter
+      [  12] __CxxFrameHandler
+      [  13] __CxxFrameHandler2
+      [  14] __CxxFrameHandler3
+      [  15] __CxxQueryExceptionSize
+      [  16] __CxxRegisterExceptionObject
+      [  17] __CxxUnregisterExceptionObject
+      [  18] __DestructExceptionObject
+      [  19] __FrameUnwindFilter
+      [  20] __GetPlatformExceptionInfo
+      [  21] __NLG_Dispatch2
+      [  22] __NLG_Return2
+      [  23] __RTCastToVoid
+      [  24] __RTDynamicCast
+      [  25] __RTtypeid
+      [  26] __TypeMatch
+      [  27] __current_exception
+      [  28] __current_exception_context
+      [  29] __intrinsic_setjmp
+      [  30] __intrinsic_setjmpex
+      [  31] __processing_throw
+      [  32] __report_gsfailure
+      [  33] __std_exception_copy
+      [  34] __std_exception_destroy
+      [  35] __std_terminate
+      [  36] __std_type_info_compare
+      [  37] __std_type_info_destroy_list
+      [  38] __std_type_info_hash
+      [  39] __std_type_info_name
+      [  40] __telemetry_main_invoke_trigger
+      [  41] __telemetry_main_return_trigger
+      [  42] __unDName
+      [  43] __unDNameEx
+      [  44] __uncaught_exception
+      [  45] __uncaught_exceptions
+      [  46] __vcrt_GetModuleFileNameW
+      [  47] __vcrt_GetModuleHandleW
+      [  48] __vcrt_InitializeCriticalSectionEx
+      [  49] __vcrt_LoadLibraryExW
+      [  50] _get_purecall_handler
+      [  51] _get_unexpected
+      [  52] _is_exception_typeof
+      [  53] _local_unwind
+      [  54] _purecall
+      [  55] _set_purecall_handler
+      [  56] _set_se_translator
+      [  57] longjmp
+      [  58] memchr
+      [  59] memcmp
+      [  60] memcpy
+      [  61] memmove
+      [  62] memset
+      [  63] set_unexpected
+      [  64] strchr
+      [  65] strrchr
+      [  66] strstr
+      [  67] unexpected
+      [  68] wcschr
+      [  69] wcsrchr
+      [  70] wcsstr
+</pre></div>
+</div>
+<p>So, numbers 0 through 56 appear to me (= njs) to be internal machinery
+used for C++ exceptions and <a class="reference external" href="https://en.wikipedia.org/wiki/Run-time_type_information">RTTI</a>. I&#8217;m
+pretty sure this stuff is all irrelevant to us, because libgcc should
+already be providing the equivalent machinery needed for any C++ code
+that&#8217;s compiled using gcc, and trying to achieve C++ ABI compatibility
+between MSVC and gcc is outside the scope of this project.</p>
+<p>Of the rest, <code class="docutils literal"><span class="pre">set_unexpected</span></code> and <code class="docutils literal"><span class="pre">unexpected</span></code> can be ignored,
+because they&#8217;re yet more C++-related nonsense that <a class="reference external" href="https://msdn.microsoft.com/en-us/library/h46t5b69.aspx">apparently isn&#8217;t
+even used anymore</a>), but the
+others are real standard C functions, and a quick check reveals that
+most of them are <em>not</em> available in <code class="docutils literal"><span class="pre">ucrtbase.dll</span></code>, but only here in
+<code class="docutils literal"><span class="pre">vcruntime140.dll</span></code>.</p>
+<p>These can be broken down further into two categories:</p>
+<ol class="arabic">
+<li><p class="first">Simple string functions: <code class="docutils literal"><span class="pre">memchr</span></code>, <code class="docutils literal"><span class="pre">memcmp</span></code>, <code class="docutils literal"><span class="pre">memcpy</span></code>,
+<code class="docutils literal"><span class="pre">memmove</span></code>, <code class="docutils literal"><span class="pre">memset</span></code>, <code class="docutils literal"><span class="pre">strchr</span></code>, <code class="docutils literal"><span class="pre">strrchr</span></code>, <code class="docutils literal"><span class="pre">strstr</span></code>,
+<code class="docutils literal"><span class="pre">wcschr</span></code>, <code class="docutils literal"><span class="pre">wcsrchr</span></code>, <code class="docutils literal"><span class="pre">wcsstr</span></code>. These are crucial functions
+that we definitely need to support, but there&#8217;s no particular
+advantage to using the implementation from
+<code class="docutils literal"><span class="pre">vcruntime140.dll</span></code>. They can just be reimplemented inside
+mingw-w64. (Basic working versions are trivial; making them fast
+takes more work, but could be lifted from BSD libc or whatever.)</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">setjmp</span></code> / <code class="docutils literal"><span class="pre">longjmp</span></code>: Reimplementing these from scratch would
+be a huuuuge hassle. Fortunately, they&#8217;re a very advanced and
+tricky feature that&#8217;s rarely useful! ...But unfortunately, both
+numpy and scipy actually use them. Numpy&#8217;s usage might be optional
+(it has fallback code for if they&#8217;re not available, and the only
+cost would be that you couldn&#8217;t hit control-C to interrupt a
+long-running inner-loop &#8211; and this may not even work on Windows
+in the first place), but scipy uses them for actual flow control
+D-:. It&#8217;s possible this could just be fixed in scipy if necessary.</p>
+<p>setjmp/longjmp may also be needed for exception handling to work in
+32-bit mingw-w64-compiled C++ code. Though I&#8217;m actually a bit
+confused on this point, since the copy of <code class="docutils literal"><span class="pre">libgcc_s_sjlj-1.dll</span></code>
+that I have on my Debian box doesn&#8217;t actually seem to contain any
+references to the <code class="docutils literal"><span class="pre">setjmp</span></code> or <code class="docutils literal"><span class="pre">longjmp</span></code> symbols in the CRT?</p>
+<p>On further investigation it looks like <em>maybe</em> the reason libgcc
+does not import setjmp/longjmp from the CRT is that it is built to
+use the gcc builtins <code class="docutils literal"><span class="pre">__builtin_setjmp</span></code> / <code class="docutils literal"><span class="pre">__builtin_longjmp</span></code>
+instead? If these exist and are functional in mingw-w64 builds then
+that is an even better solution &#8211; we just need to set up the
+headers so that user code that tries to call setjmp/longjmp are
+redirected to the builtins. Maybe. Need to check with mingw-w64
+folks about this.</p>
+</li>
+</ol>
 </div>
 <div class="section" id="math-precision-issues">
 <h2>Math precision issues<a class="headerlink" href="#math-precision-issues" title="Permalink to this headline">¶</a></h2>
@@ -226,7 +367,7 @@ different processors or gcc compile farm.</li>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">The Mingwpy project</a></li>
+      <li>Previous: <a href="background.html" title="previous chapter">Background</a></li>
       <li>Next: <a href="glossary.html" title="next chapter">Glossary</a></li>
   </ul></li>
 </ul>

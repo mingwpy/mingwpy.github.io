@@ -6,7 +6,8 @@ Originally by Carl Kleffner.
 What is mingw-w64
 -----------------
 
-mingw-w64 is a fork of the mingw32 project - see: http://sourceforge.net/apps/trac/mingw-w64/wiki/History
+mingw-w64 is a fork of the mingw32 project - see:
+http://sourceforge.net/apps/trac/mingw-w64/wiki/History
 
 Why choose mingw-w64 over mingw
 -------------------------------
