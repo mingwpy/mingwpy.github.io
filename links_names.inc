@@ -22,6 +22,7 @@
 .. _PE: https://en.wikipedia.org/wiki/Portable_Executable
 .. _Structured exception handling:
 .. _SEH: https://www.microsoft.com/msj/0197/exception/exception.aspx
+.. _Windows DLL notes: https://github.com/numpy/numpy/wiki/windows-dll-notes
 
 .. Documentation
 .. _sphinx: http://sphinx-doc.org

@@ -2,14 +2,49 @@
 Issues
 ######
 
+******************************************
+Finding the mingw-w64 runtime library code
+******************************************
+
+It is difficult to guarantee that a compiled Python extension will be able to
+find the correct version of runtime DLLs |--| see: `Windows DLL notes`_.
+
+One method to avoid this problem is to include any necessary runtime code in
+the compiled extension.  This can be done by:
+
+* Compiling all extensions (DLLs) with ``-static-libgcc``,
+  ``-static-libstdc++`` etc flags;
+* Using a gcc compiler toolchain that does static linking to runtimes by
+  default.  This is a "static toolchain".  The `mingw-builds`_ set of scripts
+  builds such a toolchain by passing the ``--static-gcc`` argument (see:
+  `mingw-build build file
+  <https://github.com/niXman/mingw-builds/blob/17ae841dcf6e72badad7941a06d631edaf687436/build#L218>`_;
+
+Using these approaches, all the necessary object code from the GCC runtimes
+will be statically linked into the binaries. As a consequence the binary size
+will be increased in comparison to the standard toolchains / dynamic linking.
+The advantage is, that there will be no dependency to external GCC runtime
+libraries, so the deployment of Python extensions is greatly improved. 
+
+However, exception heavy C++ programs such as QT should be compiled with
+shared runtimes to avoid problems with exception handling over DLL boundaries.
+
+For building typically Python extensions a customized static GCC toolchain is
+the best compromise IMHO.
+
 ******************************
 MS / gcc ABI incompatibilities
 ******************************
 
-``-mincoming-stack-boundary=2``
+There is a win32 default stack alignment incompatibility: GCC code provides
+(and assumes) 16 (2^4) byte stack alignment since GCC4.6, but MSVC uses 4
+(2^2) byte stack alignment.
 
-Problem may be that MSVC on 32-bits only guarantees 4 (2^2) byte code
-alignment, whereas gcc can assume 16 (2^4) byte stack alignment.
+Win64 X86_64 is not affected.  This issue is the major cause for segment
+faults on 32bit systems.
+
+The solution* is to use the ``-mincoming-stack-boundary=2`` flag for
+compiling.
 
 From:
 https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs
@@ -276,17 +311,38 @@ build system updates.
 Disutils issues
 ***************
 
+Mingw via Python distutils needs to link extension code to the correct Python
+library, e.g. ``libpython27.dll``.  To do this, mingw needs a library
+definition file ``libpython27.a``.  It is possible to create this file using
+the mingw-w64 tools.
+
+numpy distutils currently needs patching to pass correct flags to compiler /
+linkg.
+
 How to return correct flags to mingw-w64, from Python built with MSVC?
+
+******************
+Manifest resources
+******************
+
+Solution is to extend the GCC toolchain with the Manifest resource files and
+ensure linkage with the help of the 'specs' file.
 
 ***********************
 BLAS / LAPACK libraries
 ***********************
 
+There is no silver bullet for the problem of finding fast, reliable BLAS and
+LAPACK routines with a suitable license. ! A trade-off between licence
+acceptance, performance and stability remains to be found. OpenBLAS on Win32
+seems to be quite stable. Some OpenBLAS issues on Win64 can be adressed with a
+single threaded version of that library.
+
 Problems with OpenBLAS.
 
 A small number of test failures with numpy / scipy.
 
-ATLAS instead?
+Consider ATLAS instead?
 
 MKL licensing appears to still require us (the wheel package authors) to
 require you (the wheel package users) not to reverse engineer the MKL
@@ -316,3 +372,5 @@ Partial to-do list
 
 * Create test rig for OpenBLAS maybe via numpy, implement on buildbots with
   different processors or gcc compile farm.
+
+.. include:: links_names.inc
