@@ -167,7 +167,8 @@ mingw-w64 headers (tuned to MSVCRT.DLL) and those in the newer C runtime.</p>
 <li><code class="docutils literal"><span class="pre">ucrtbase.dll</span></code>;</li>
 <li><code class="docutils literal"><span class="pre">vcruntime140.dll</span></code>;</li>
 </ul>
-<p>of which the first will be keep a stable API / ABI across new VS releases.</p>
+<p>of which the first will be kept with a backwards-compatible API / ABI across
+new VS releases.</p>
 <p>Second, linking correctly to these new 2015 libraries requires careful choice
 of the DLL import library.</p>
 <p>(Quoting Nathaniel Smith on email):</p>
