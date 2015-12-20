@@ -131,7 +131,8 @@ Firstly, the CRT is now two files:
 * ``ucrtbase.dll``;
 * ``vcruntime140.dll``;
 
-of which the first will be keep a stable API / ABI across new VS releases.
+of which the first will be kept with a backwards-compatible API / ABI across
+new VS releases.
 
 Second, linking correctly to these new 2015 libraries requires careful choice
 of the DLL import library.
