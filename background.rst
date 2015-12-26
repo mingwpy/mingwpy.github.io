@@ -61,11 +61,11 @@ The compiler toolchain
 
 To build software with mingw-w64 you will likely need:
 
-* the compiler (gcc, compiled from standard gcc sources), augumented with *
-  the mingw-w64 extensions, including Windows-specific headers and runtime
+* the compiler (gcc, compiled from standard gcc sources), augumented with the
+  mingw-w64 extensions, including Windows-specific headers and runtime
   libraries;
 * a build of the GNU :term:`binutils` tools, containing utility programs such
-  as ``ld``, ``ar``, ``dlltool``;
+  as ``ld``, ``ar``, ``dlltool``.
 
 ********************
 C++ exception models
