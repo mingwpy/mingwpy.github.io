@@ -56,19 +56,20 @@ format, where we build three ATLAS libraries:
 * with support for SSE3 instructions;
 
 We make three Windows ``.exe`` installers, one for each of these ATLAS
-versions, and then build a "superpack" installer that first checks the machine
-on which the installer is running, to find what instructions the CPU supports,
-and the installs the matching numpy / ATLAS package.
+versions, and then build a "superpack" installer from these three installers,
+that first checks the machine on which the superpack installer is running, to
+find what instructions the CPU supports, and then installs the matching numpy
+/ ATLAS package.
 
-There is no way of doing this when installing from a binary wheel_, because
-the wheel installation process consists of unpacking files to given
-destinations, and does not allow pre-install or post-install scripts.
+There is no way of doing this when installing from binary wheels_, because the
+wheel installation process consists of unpacking files to given destinations,
+and does not allow pre-install or post-install scripts.
 
 One option would be to build a binary wheel with ATLAS that depends on SSE2
 instructions.  It seems that 99.5% of Windows machines have SSE2 (see:
-`Windows versions`).  It technically not difficult to put a check in the numpy
-``__init__.py`` file to give a helpful error message and die when the CPU does
-not have SSE2::
+`Windows versions`_).  It is not technically difficult to put a check in the
+numpy ``__init__.py`` file to give a helpful error message and die when the
+CPU does not have SSE2::
 
     try:
         from ctypes import windll, wintypes
@@ -88,7 +89,7 @@ Intel Math Kernel Library
 *************************
 
 The MKL_ has a reputation for being fast, particularly on Intel chips (see the
-`MLK Wikipedia entry`_). It has good performance on `benchmarks
+`MKL Wikipedia entry`_). It has good performance on `benchmarks
 <http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf>`_ across
 the range, `except on AMD processors
 <http://www.agner.org/optimize/blog/read.php?i=49#49>`_.
@@ -114,13 +115,12 @@ binaries, but carries the following extra license terms:
        lawsuits, including attorney's fees, that arise or result from Your
        modifications, derivative works or Your distribution of Your Product.
 
-Clause iv above requires us to somehow get our users to agree to extra license
-terms. This is presumably not practical using an automated installation method
-like pip / pypi.  Clause v makes us, the developers responsible for legal cost
+Clause iv does allow us numpyers (as we use the BSD license) to distribute
+wheels without asking the users to submit to extra licensing terms.
+Unfortunately clause v makes us, the developers, responsible for legal cost
 that could be very large.
 
-See discussions about `MKL on numpy mailing
-list
+See discussions about `MKL on numpy mailing list
 <http://numpy-discussion.10968.n7.nabble.com/Windows-wheels-using-MKL-td37097.html>`_
 and `MKL on Julia issues <https://github.com/JuliaLang/julia/issues/4272>`_.
 

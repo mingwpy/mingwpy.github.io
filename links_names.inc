@@ -72,6 +72,7 @@
 .. _distribute: http://pypi.python.org/pypi/distribute
 .. _pip: http://pypi.python.org/pypi/pip
 .. _easy_install: https://pythonhosted.org/setuptools/easy_install.html
+.. _wheel:
 .. _wheels: https://pypi.python.org/pypi/wheel
 .. _numpy: http://www.numpy.org
 .. _matplotlib: http://matplotlib.org/
