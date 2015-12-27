@@ -68,8 +68,7 @@ There is a win32 default stack alignment incompatibility: GCC code provides
 Win64 X86_64 is not affected.  This issue is the major cause for segment
 faults on 32bit systems.
 
-The solution* is to use the ``-mincoming-stack-boundary=2`` flag for
-compiling.
+The solution is to use the ``-mincoming-stack-boundary=2`` flag for compiling.
 
 From:
 https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs
@@ -346,7 +345,7 @@ the mingw-w64 tools.
 with CPython itself?*
 
 numpy distutils currently needs patching to pass correct flags to compiler /
-linkg.
+linker.
 
 How to return correct flags to mingw-w64, from Python built with MSVC?
 
@@ -365,21 +364,9 @@ BLAS / LAPACK libraries
 ***********************
 
 There is no silver bullet for the problem of finding fast, reliable BLAS and
-LAPACK routines with a suitable license. ! A trade-off between licence
-acceptance, performance and stability remains to be found. OpenBLAS on Win32
-seems to be quite stable. Some OpenBLAS issues on Win64 can be adressed with a
-single threaded version of that library.
+LAPACK routines with a suitable license.
 
-Problems with OpenBLAS.
-
-A small number of test failures with numpy / scipy.
-
-Consider ATLAS instead?
-
-MKL licensing appears to still require us (the wheel package authors) to
-require you (the wheel package users) not to reverse engineer the MKL
-binaries (an extra license restriction).  Package authors have to indemnify
-Intel against being sued by the package users.
+See :doc:`blas_lapack`.
 
 ******************
 Partial to-do list

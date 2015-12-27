@@ -18,6 +18,31 @@
    https://bitbucket.org/carlkl/mingw-w64-for-python/downloads
 .. _mingwpy anaconda site: https://anaconda.org/carlkl/mingwpy
 
+.. BLAS / LAPACK
+.. _BLAS: http://www.netlib.org/blas/
+.. _LAPACK: http://www.netlib.org/lapack/
+.. _ATLAS: http://math-atlas.sourceforge.net
+.. _Intel MKL:
+.. _MKL: https://software.intel.com/en-us/intel-mkl
+.. _MKL wikipedia entry: https://en.wikipedia.org/wiki/Math_Kernel_Library
+.. _OpenBLAS: http://www.openblas.net
+.. _OpenBLAS on github: https://github.com/xianyi/OpenBLAS
+.. _CBLAS: http://www.prism.gatech.edu/~ndantam3/cblas-doc/doc/html/main.html
+.. _AMD core math library:
+.. _ACML:
+   http://developer.amd.com/tools-and-sdks/cpu-development/amd-core-math-library-acml
+.. _AMD compute libraries:
+.. _ACL:
+   http://developer.amd.com/tools-and-sdks/opencl-zone/acl-amd-compute-libraries/
+.. _BLIS: https://github.com/flame/blis
+.. _libflame: https://github.com/flame/libflame
+.. _netlib BLAS: http://www.netlib.org/blas
+.. _netlib LAPACK: http://www.netlib.org/lapack/index.html
+.. _GotoBLAS2: https://www.tacc.utexas.edu/tacc-projects/gotoblas2
+.. _BLAS LAPACK review:
+   http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf
+.. _Eigen: http://eigen.tuxfamily.org/index.php?title=Main_Page
+
 .. Windows
 .. _PE format:
 .. _Portable executable format:
@@ -26,6 +51,7 @@
 .. _Structured exception handling:
 .. _SEH: https://www.microsoft.com/msj/0197/exception/exception.aspx
 .. _Windows DLL notes: https://github.com/numpy/numpy/wiki/windows-dll-notes
+.. _Windows versions: https://github.com/numpy/numpy/wiki/Windows-versions
 
 .. Documentation
 .. _sphinx: http://sphinx-doc.org
@@ -72,6 +98,9 @@
 .. _glibc: https://www.gnu.org/software/libc
 .. _binutils: http://www.gnu.org/software/binutils
 .. _binutils wikipedia page: https://en.wikipedia.org/wiki/GNU_Binutils
+
+.. Languages
+.. _Julia: http://julialang.org
 
 .. Licenses
 .. _CC0 license: http://creativecommons.org/publicdomain/zero/1.0/legalcode
