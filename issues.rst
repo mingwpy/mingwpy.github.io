@@ -332,9 +332,9 @@ Bionic's libm is here: https://github.com/android/platform_bionic/tree/master/li
 Basically what would be needed is just copying these files into mingw-w64 plus
 build system updates.
 
-***************
-Disutils issues
-***************
+****************
+Distutils issues
+****************
 
 Mingw via Python distutils needs to link extension code to the correct Python
 library, e.g. ``libpython27.dll``.  To do this, mingw needs a library
