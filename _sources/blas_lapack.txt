@@ -18,7 +18,7 @@ binary installers on Windows to date (end of 2015).
 
 ATLAS uses comprehensive tests of parameters on a particular machine to chose
 from a range of algorithms to optimize BLAS and some LAPACK routines.  Modern
-versions (>= 3.9) perform reasonably well on `benchmarks
+versions (>= 3.9) perform reasonably well on `BLAS benchmarks
 <http://cran.r-project.org/web/packages/gcbd/vignettes/gcbd.pdf>`_.
 Each ATLAS build is optimized for a particular machine (CPU
 capabilities, L1 / L2 cache size, memory speed), and ATLAS does not select
@@ -89,7 +89,7 @@ Intel Math Kernel Library
 *************************
 
 The MKL_ has a reputation for being fast, particularly on Intel chips (see the
-`MKL Wikipedia entry`_). It has good performance on `benchmarks
+`MKL Wikipedia entry`_). It has good performance on `BLAS / LAPACK benchmarks
 <http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf>`_ across
 the range, `except on AMD processors
 <http://www.agner.org/optimize/blog/read.php?i=49#49>`_.
@@ -117,7 +117,7 @@ binaries, but carries the following extra license terms:
 
 Clause iv does allow us numpyers (as we use the BSD license) to distribute
 wheels without asking the users to submit to extra licensing terms.
-Unfortunately clause v makes us, the developers, responsible for legal cost
+Unfortunately clause v makes us, the developers, responsible for legal costs
 that could be very large.
 
 See discussions about `MKL on numpy mailing list
@@ -133,7 +133,6 @@ Advantages:
 Disadvantages:
 
 * Closed source;
-* License terms prevent automated installation;
 * License terms probably not acceptable to numpy developers.
 
 *********************
@@ -141,7 +140,7 @@ AMD Core Math Library
 *********************
 
 The ACML_ was AMD's equivalent to the MKL, with `similar
-<http://eigen.tuxfamily.org/index.php?title=Benchmark-March2009>` or
+<http://eigen.tuxfamily.org/index.php?title=Benchmark-March2009>`_ or
 `moderately worse
 <http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf>`_
 performance.  As of time of writing (December 2015), AMD has marked the ACML
@@ -171,9 +170,10 @@ AMD compute libraries
 
 AMD advertise the `AMD compute libraries`_ (ACL) as the successor to the ACML.
 
-The ACL page points us to :ref:`blis` for BLAS and :ref:`libflame` for LAPACK.
+The ACL page points us to :ref:`blis-section` for BLAS and
+:ref:`libflame-section` for LAPACK.
 
-.. _blis:
+.. _blis-section:
 
 ******************************************
 BLAS-like instantiation software framework
@@ -206,7 +206,7 @@ Disadvantages:
 * Windows builds are experimental;
 * No runtime hardware detection.
 
-.. _libflame:
+.. _libflame-section:
 
 ********
 libflame
@@ -216,8 +216,8 @@ libflame
 project page <http://www.cs.utexas.edu/~flame/web/libFLAME.html>`_ for more
 detail.
 
-libflame can also a full LAPACK implementation.  It is a sister project to
-BLIS.
+libflame can also be built to include a full LAPACK implementation.  It is a
+sister project to BLIS.
 
 ******
 COBLAS
@@ -242,7 +242,7 @@ than any optimized library.
 Eigen
 *****
 
-_Eigen is "a C++ template library for linear algebra: matrices, vectors,
+Eigen_ is "a C++ template library for linear algebra: matrices, vectors,
 numerical solvers, and related algorithms."
 
 Mostly covered by the Mozilla Public Licence 2, but some features covered by
@@ -259,10 +259,11 @@ See `Eigen FAQ entry discussing BLAS / LAPACK
 GotoBLAS2
 *********
 
-GotoBLAS_ is the predecessor to OpenBLAS_.  It was a library written by
-Kazushige Goto, and released under a BSD license, but is no longer maintained.
-Goto now works for Intel. It was at or near the top of benchmarks on which it
-has been tested (e.g `BLAS LAPACK review`_ `Eigen benchmarks
+GotoBLAS2_ is the predecessor to OpenBLAS_.  It was a library written by
+`Kazushige Goto <https://en.wikipedia.org/wiki/Kazushige_Goto>`_, and released
+under a BSD license, but is no longer maintained.  Goto now works for Intel.
+It was at or near the top of benchmarks on which it has been tested (e.g `BLAS
+LAPACK review`_ `Eigen benchmarks
 <http://eigen.tuxfamily.org/index.php?title=Benchmark>`_).  Like MKL and ACML,
 GotoBLAS2 chooses routines at runtime according to the processor. It does not
 detect modern processors (after 2011).

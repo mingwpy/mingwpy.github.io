@@ -49,7 +49,7 @@ installed with the operating system.</p>
 binary installers on Windows to date (end of 2015).</p>
 <p>ATLAS uses comprehensive tests of parameters on a particular machine to chose
 from a range of algorithms to optimize BLAS and some LAPACK routines.  Modern
-versions (&gt;= 3.9) perform reasonably well on <a class="reference external" href="http://cran.r-project.org/web/packages/gcbd/vignettes/gcbd.pdf">benchmarks</a>.
+versions (&gt;= 3.9) perform reasonably well on <a class="reference external" href="http://cran.r-project.org/web/packages/gcbd/vignettes/gcbd.pdf">BLAS benchmarks</a>.
 Each ATLAS build is optimized for a particular machine (CPU
 capabilities, L1 / L2 cache size, memory speed), and ATLAS does not select
 routines at runtime but at build time, meaning that a default ATLAS build can
@@ -114,7 +114,7 @@ CPU does not have SSE2:</p>
 <div class="section" id="intel-math-kernel-library">
 <h2>Intel Math Kernel Library<a class="headerlink" href="#intel-math-kernel-library" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="https://software.intel.com/en-us/intel-mkl">MKL</a> has a reputation for being fast, particularly on Intel chips (see the
-<a class="reference external" href="https://en.wikipedia.org/wiki/Math_Kernel_Library">MKL Wikipedia entry</a>). It has good performance on <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">benchmarks</a> across
+<a class="reference external" href="https://en.wikipedia.org/wiki/Math_Kernel_Library">MKL Wikipedia entry</a>). It has good performance on <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">BLAS / LAPACK benchmarks</a> across
 the range, <a class="reference external" href="http://www.agner.org/optimize/blog/read.php?i=49#49">except on AMD processors</a>.</p>
 <p>It is closed-source, but available for free under the <a class="reference external" href="https://software.intel.com/sites/campaigns/nest">Community licensing
 program</a>.</p>
@@ -139,7 +139,7 @@ modifications, derivative works or Your distribution of Your Product.</p>
 </div></blockquote>
 <p>Clause iv does allow us numpyers (as we use the BSD license) to distribute
 wheels without asking the users to submit to extra licensing terms.
-Unfortunately clause v makes us, the developers, responsible for legal cost
+Unfortunately clause v makes us, the developers, responsible for legal costs
 that could be very large.</p>
 <p>See discussions about <a class="reference external" href="http://numpy-discussion.10968.n7.nabble.com/Windows-wheels-using-MKL-td37097.html">MKL on numpy mailing list</a>
 and <a class="reference external" href="https://github.com/JuliaLang/julia/issues/4272">MKL on Julia issues</a>.</p>
@@ -152,14 +152,12 @@ CPUs.</li>
 <p>Disadvantages:</p>
 <ul class="simple">
 <li>Closed source;</li>
-<li>License terms prevent automated installation;</li>
 <li>License terms probably not acceptable to numpy developers.</li>
 </ul>
 </div>
 <div class="section" id="amd-core-math-library">
 <h2>AMD Core Math Library<a class="headerlink" href="#amd-core-math-library" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference external" href="http://developer.amd.com/tools-and-sdks/cpu-development/amd-core-math-library-acml">ACML</a> was AMD&#8217;s equivalent to the MKL, with <cite>similar
-&lt;http://eigen.tuxfamily.org/index.php?title=Benchmark-March2009&gt;</cite> or
+<p>The <a class="reference external" href="http://developer.amd.com/tools-and-sdks/cpu-development/amd-core-math-library-acml">ACML</a> was AMD&#8217;s equivalent to the MKL, with <a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=Benchmark-March2009">similar</a> or
 <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">moderately worse</a>
 performance.  As of time of writing (December 2015), AMD has marked the ACML
 as &#8220;end of life&#8221;, and suggests using the <a class="reference external" href="http://developer.amd.com/tools-and-sdks/opencl-zone/acl-amd-compute-libraries/">AMD compute libraries</a> instead.</p>
@@ -181,11 +179,12 @@ works based upon the Software in whole or in part [...]</p>
 <div class="section" id="amd-compute-libraries">
 <h2>AMD compute libraries<a class="headerlink" href="#amd-compute-libraries" title="Permalink to this headline">¶</a></h2>
 <p>AMD advertise the <a class="reference external" href="http://developer.amd.com/tools-and-sdks/opencl-zone/acl-amd-compute-libraries/">AMD compute libraries</a> (ACL) as the successor to the ACML.</p>
-<p>The ACL page points us to <span class="xref std std-ref">blis</span> for BLAS and <span class="xref std std-ref">libflame</span> for LAPACK.</p>
+<p>The ACL page points us to <a class="reference internal" href="#blis-section"><span>BLAS-like instantiation software framework</span></a> for BLAS and
+<a class="reference internal" href="#libflame-section"><span>libflame</span></a> for LAPACK.</p>
 </div>
 <div class="section" id="blas-like-instantiation-software-framework">
-<span id="blis"></span><h2>BLAS-like instantiation software framework<a class="headerlink" href="#blas-like-instantiation-software-framework" title="Permalink to this headline">¶</a></h2>
-<p><a href="#id12"><span class="problematic" id="id13">BLIS_</span></a> is &#8220;a portable software framework for instantiating high-performance BLAS-like dense linear algebra libraries.&#8221;</p>
+<span id="blis-section"></span><h2>BLAS-like instantiation software framework<a class="headerlink" href="#blas-like-instantiation-software-framework" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/flame/blis">BLIS</a> is &#8220;a portable software framework for instantiating high-performance BLAS-like dense linear algebra libraries.&#8221;</p>
 <p>It provides a <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#im-not-really-interested-in-all-of-these-newfangled-features-in-blis-can-i-just-use-blis-as-a-blas-library">superset of BLAS</a>,
 along with a <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#what-about-cblas">CBLAS layer</a>.</p>
 <p>It can be compiled into a BLAS library. As of writing (December 2015) <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#can-i-build-blis-on-windows--mac-os-x">Windows
@@ -205,12 +204,12 @@ only a few emails since August 2015.</p>
 </ul>
 </div>
 <div class="section" id="libflame">
-<span id="id2"></span><h2>libflame<a class="headerlink" href="#libflame" title="Permalink to this headline">¶</a></h2>
-<p><a href="#id14"><span class="problematic" id="id15">`libflame`_</span></a> is an implementation of some LAPACK routines. See the <a class="reference external" href="http://www.cs.utexas.edu/~flame/web/libFLAME.html">libflame
+<span id="libflame-section"></span><h2>libflame<a class="headerlink" href="#libflame" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/flame/libflame">libflame</a> is an implementation of some LAPACK routines. See the <a class="reference external" href="http://www.cs.utexas.edu/~flame/web/libFLAME.html">libflame
 project page</a> for more
 detail.</p>
-<p>libflame can also a full LAPACK implementation.  It is a sister project to
-BLIS.</p>
+<p>libflame can also be built to include a full LAPACK implementation.  It is a
+sister project to BLIS.</p>
 </div>
 <div class="section" id="coblas">
 <h2>COBLAS<a class="headerlink" href="#coblas" title="Permalink to this headline">¶</a></h2>
@@ -227,7 +226,7 @@ than any optimized library.</p>
 </div>
 <div class="section" id="eigen">
 <h2>Eigen<a class="headerlink" href="#eigen" title="Permalink to this headline">¶</a></h2>
-<p>_Eigen is &#8220;a C++ template library for linear algebra: matrices, vectors,
+<p><a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen</a> is &#8220;a C++ template library for linear algebra: matrices, vectors,
 numerical solvers, and related algorithms.&#8221;</p>
 <p>Mostly covered by the Mozilla Public Licence 2, but some features covered by
 the LGPL.  <a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=FAQ#Disabling_non_MPL2_features">Non-MPL2 features can be disabled</a></p>
@@ -237,10 +236,11 @@ currently no CBLAS interface.</p>
 </div>
 <div class="section" id="gotoblas2">
 <h2>GotoBLAS2<a class="headerlink" href="#gotoblas2" title="Permalink to this headline">¶</a></h2>
-<p><a href="#id16"><span class="problematic" id="id17">GotoBLAS_</span></a> is the predecessor to <a class="reference external" href="http://www.openblas.net">OpenBLAS</a>.  It was a library written by
-Kazushige Goto, and released under a BSD license, but is no longer maintained.
-Goto now works for Intel. It was at or near the top of benchmarks on which it
-has been tested (e.g <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">BLAS LAPACK review</a> <a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=Benchmark">Eigen benchmarks</a>).  Like MKL and ACML,
+<p><a class="reference external" href="https://www.tacc.utexas.edu/tacc-projects/gotoblas2">GotoBLAS2</a> is the predecessor to <a class="reference external" href="http://www.openblas.net">OpenBLAS</a>.  It was a library written by
+<a class="reference external" href="https://en.wikipedia.org/wiki/Kazushige_Goto">Kazushige Goto</a>, and released
+under a BSD license, but is no longer maintained.  Goto now works for Intel.
+It was at or near the top of benchmarks on which it has been tested (e.g <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">BLAS
+LAPACK review</a> <a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=Benchmark">Eigen benchmarks</a>).  Like MKL and ACML,
 GotoBLAS2 chooses routines at runtime according to the processor. It does not
 detect modern processors (after 2011).</p>
 </div>
