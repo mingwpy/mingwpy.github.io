@@ -24,13 +24,38 @@ Using these approaches, all the necessary object code from the GCC runtimes
 will be statically linked into the binaries. As a consequence the binary size
 will be increased in comparison to the standard toolchains / dynamic linking.
 The advantage is, that there will be no dependency to external GCC runtime
-libraries, so the deployment of Python extensions is greatly improved. 
+libraries, so the deployment of Python extensions is greatly improved.
 
 However, exception heavy C++ programs such as QT should be compiled with
 shared runtimes to avoid problems with exception handling over DLL boundaries.
 
 For building typically Python extensions a customized static GCC toolchain is
 the best compromise IMHO.
+
+**Note from njs:** This definitely sounds like the right thing to try
+initially, *but* it's possible (likely?) that we'll run into the `same
+problem that Steve Dower ran into with trying to set up MSVC to
+statically link the runtime code
+<http://stevedower.id.au/blog/building-for-python-3-5-part-two/>`_,
+i.e., TLS keys are a limited resource, so if libgcc allocates any TLS
+keys at startup, and every extension module has its own copy of
+libgcc, then this puts a hard cap on how many Python extension modules
+can be loaded into a single process. Which is really bad (consider
+projects like Sage that make heavy use of Cython, and each Cython
+source file creates a separate extension...). Or at least, it's really
+bad IF it's a problem at all. In fact I have no idea whether libgcc
+allocates any TLS keys at startup -- introspecting a handy copy of
+libgcc*.dll shows that it does contain references to ``TlsAlloc``, but
+I don't know whether they're called under ordinary circumstances. So
+we should start with static linking, but have a fallback plan in case
+it doesn't work.
+
+Worst case, I think our fallback plan is to switch back to dynamic
+linking, and require projects to use one of the standard dynamic
+linking strategies that we've discussed elsewhere. Possibly this means
+the mingwpy project will eventually want to start shipping a
+mingw-w64-runtime wheel, similar to what we've discussed doing with
+BLAS dlls, that projects could declare a dependency on.
 
 ******************************
 MS / gcc ABI incompatibilities
@@ -43,8 +68,7 @@ There is a win32 default stack alignment incompatibility: GCC code provides
 Win64 X86_64 is not affected.  This issue is the major cause for segment
 faults on 32bit systems.
 
-The solution* is to use the ``-mincoming-stack-boundary=2`` flag for
-compiling.
+The solution is to use the ``-mincoming-stack-boundary=2`` flag for compiling.
 
 From:
 https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs
@@ -308,17 +332,20 @@ Bionic's libm is here: https://github.com/android/platform_bionic/tree/master/li
 Basically what would be needed is just copying these files into mingw-w64 plus
 build system updates.
 
-***************
-Disutils issues
-***************
+****************
+Distutils issues
+****************
 
 Mingw via Python distutils needs to link extension code to the correct Python
 library, e.g. ``libpython27.dll``.  To do this, mingw needs a library
 definition file ``libpython27.a``.  It is possible to create this file using
 the mingw-w64 tools.
 
+*Query from njs: can't we just use the python27.lib that's shipped
+with CPython itself?*
+
 numpy distutils currently needs patching to pass correct flags to compiler /
-linkg.
+linker.
 
 How to return correct flags to mingw-w64, from Python built with MSVC?
 
@@ -329,26 +356,17 @@ Manifest resources
 Solution is to extend the GCC toolchain with the Manifest resource files and
 ensure linkage with the help of the 'specs' file.
 
+*If this is the solution, then what's the problem? Carl, could you add
+some text here elaborating? (and then delete this comment :-)) -njs*
+
 ***********************
 BLAS / LAPACK libraries
 ***********************
 
 There is no silver bullet for the problem of finding fast, reliable BLAS and
-LAPACK routines with a suitable license. ! A trade-off between licence
-acceptance, performance and stability remains to be found. OpenBLAS on Win32
-seems to be quite stable. Some OpenBLAS issues on Win64 can be adressed with a
-single threaded version of that library.
+LAPACK routines with a suitable license.
 
-Problems with OpenBLAS.
-
-A small number of test failures with numpy / scipy.
-
-Consider ATLAS instead?
-
-MKL licensing appears to still require us (the wheel package authors) to
-require you (the wheel package users) not to reverse engineer the MKL
-binaries (an extra license restriction).  Package authors have to indemnify
-Intel against being sued by the package users.
+See :doc:`blas_lapack`.
 
 ******************
 Partial to-do list

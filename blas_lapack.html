@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>BLAS / LAPACK on Windows &mdash; mingwpy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="blas-lapack-on-windows">
+<h1>BLAS / LAPACK on Windows<a class="headerlink" href="#blas-lapack-on-windows" title="Permalink to this headline">¶</a></h1>
+<p>Windows has no default <a class="reference external" href="http://www.netlib.org/blas/">BLAS</a> / <a class="reference external" href="http://www.netlib.org/lapack/">LAPACK</a> library.  By &#8220;default&#8221; we mean,
+installed with the operating system.</p>
+<p>Numpy needs a BLAS library that has <a class="reference external" href="http://www.prism.gatech.edu/~ndantam3/cblas-doc/doc/html/main.html">CBLAS</a> C language wrappers.</p>
+<p>Here is a list of the options that we know about.</p>
+<div class="section" id="atlas">
+<h2>ATLAS<a class="headerlink" href="#atlas" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="http://math-atlas.sourceforge.net">ATLAS</a> libraries have been the default BLAS / LAPACK libraries for numpy
+binary installers on Windows to date (end of 2015).</p>
+<p>ATLAS uses comprehensive tests of parameters on a particular machine to chose
+from a range of algorithms to optimize BLAS and some LAPACK routines.  Modern
+versions (&gt;= 3.9) perform reasonably well on <a class="reference external" href="http://cran.r-project.org/web/packages/gcbd/vignettes/gcbd.pdf">benchmarks</a>.
+Each ATLAS build is optimized for a particular machine (CPU
+capabilities, L1 / L2 cache size, memory speed), and ATLAS does not select
+routines at runtime but at build time, meaning that a default ATLAS build can
+be badly optimized for a particular processor.  The main developer of ATLAS is
+Clint Whaley.  His main priority is optimizing for HPC machines, and he does
+not give much time to supporting Windows builds.  Not surprisingly, ATLAS is
+difficult to build on Windows, and is <a class="reference external" href="http://math-atlas.sourceforge.net/atlas_install/node57">not well optimized for Windows 64 bit</a>.</p>
+<p>Advantages:</p>
+<ul class="simple">
+<li>Very reliable;</li>
+<li>BSD license;</li>
+</ul>
+<p>Disadvantages:</p>
+<ul class="simple">
+<li>By design, the compilation step of ATLAS tunes the output library to the
+exact architecture on which it is compiling.  This means good performance
+for machines very like the build machine, but worse performance on other
+machines;</li>
+<li>No runtime optimization for running CPU;</li>
+<li>Has only one major developer (Clint Whaley);</li>
+<li>Compilation is difficult, slow and error-prone on Windows;</li>
+<li>Not optimized for Windows 64 bit</li>
+</ul>
+<p>Because there is no run-time adaptation to the CPU, ATLAS built for a CPU with
+SSE3 instructions will likely crash on a CPU that does not have SSE3
+instructions, and ATLAS built for a SSE2 CPU will not be able to use SSE3
+instructions.  Therefore, numpy installers on Windows use the &#8220;superpack&#8221;
+format, where we build three ATLAS libraries:</p>
+<ul class="simple">
+<li>without CPU support for SSE instructions;</li>
+<li>with support for SSE2 instructions;</li>
+<li>with support for SSE3 instructions;</li>
+</ul>
+<p>We make three Windows <code class="docutils literal"><span class="pre">.exe</span></code> installers, one for each of these ATLAS
+versions, and then build a &#8220;superpack&#8221; installer that first checks the machine
+on which the installer is running, to find what instructions the CPU supports,
+and the installs the matching numpy / ATLAS package.</p>
+<p>There is no way of doing this when installing from a binary <a href="#id12"><span class="problematic" id="id13">wheel_</span></a>, because
+the wheel installation process consists of unpacking files to given
+destinations, and does not allow pre-install or post-install scripts.</p>
+<p>One option would be to build a binary wheel with ATLAS that depends on SSE2
+instructions.  It seems that 99.5% of Windows machines have SSE2 (see:
+<cite>Windows versions</cite>).  It technically not difficult to put a check in the numpy
+<code class="docutils literal"><span class="pre">__init__.py</span></code> file to give a helpful error message and die when the CPU does
+not have SSE2:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">windll</span><span class="p">,</span> <span class="n">wintypes</span>
+<span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+    <span class="k">pass</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">has_feature</span> <span class="o">=</span> <span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span><span class="o">.</span><span class="n">IsProcessorFeaturePresent</span>
+    <span class="n">has_feature</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_feature</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;This version of numpy needs a CPU capable of SSE2, &quot;</span>
+                <span class="s">&quot;but Windows says - not so.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+                <span class="s">&quot;Please reinstall numpy using a superpack installer&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="intel-math-kernel-library">
+<h2>Intel Math Kernel Library<a class="headerlink" href="#intel-math-kernel-library" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://software.intel.com/en-us/intel-mkl">MKL</a> has a reputation for being fast, particularly on Intel chips (see the
+<a href="#id14"><span class="problematic" id="id15">`MLK Wikipedia entry`_</span></a>). It has good performance on <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">benchmarks</a> across
+the range, <a class="reference external" href="http://www.agner.org/optimize/blog/read.php?i=49#49">except on AMD processors</a>.</p>
+<p>It is closed-source, but available for free under the <a class="reference external" href="https://software.intel.com/sites/campaigns/nest">Community licensing
+program</a>.</p>
+<p>The <a class="reference external" href="https://software.intel.com/en-us/articles/end-user-license-agreement">Intel license</a> does
+allow us, the developers, to distribute copies of the MKL with our built
+binaries, but carries the following extra license terms:</p>
+<blockquote>
+<div><ol class="upperalpha" start="8">
+<li><p class="first">DISTRIBUTION: Distribution of the Redistributables is also subject to
+the following limitations:
+[clauses i through iii omitted]</p>
+<p>[You] (iv) will provide the Redistributables subject to a license
+agreement that prohibits disassembly and reverse engineering of the
+Redistributables except in cases when you provide Your Product subject
+to an open source license that is not an Excluded License, for example,
+the BSD license, or the MIT license, (v) will indemnify, hold harmless,
+and defend Intel and its suppliers from and against any claims or
+lawsuits, including attorney&#8217;s fees, that arise or result from Your
+modifications, derivative works or Your distribution of Your Product.</p>
+</li>
+</ol>
+</div></blockquote>
+<p>Clause iv above requires us to somehow get our users to agree to extra license
+terms. This is presumably not practical using an automated installation method
+like pip / pypi.  Clause v makes us, the developers responsible for legal cost
+that could be very large.</p>
+<p>See discussions about <a class="reference external" href="http://numpy-discussion.10968.n7.nabble.com/Windows-wheels-using-MKL-td37097.html">MKL on numpy mailing
+list</a>
+and <a class="reference external" href="https://github.com/JuliaLang/julia/issues/4272">MKL on Julia issues</a>.</p>
+<p>Advantages:</p>
+<ul class="simple">
+<li>At or near maximum speed;</li>
+<li>Runtime processor selection, giving good performance on a range of different
+CPUs.</li>
+</ul>
+<p>Disadvantages:</p>
+<ul class="simple">
+<li>Closed source;</li>
+<li>License terms prevent automated installation;</li>
+<li>License terms probably not acceptable to numpy developers.</li>
+</ul>
+</div>
+<div class="section" id="amd-core-math-library">
+<h2>AMD Core Math Library<a class="headerlink" href="#amd-core-math-library" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="http://developer.amd.com/tools-and-sdks/cpu-development/amd-core-math-library-acml">ACML</a> was AMD&#8217;s equivalent to the MKL, with <cite>similar
+&lt;http://eigen.tuxfamily.org/index.php?title=Benchmark-March2009&gt;</cite> or
+<a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">moderately worse</a>
+performance.  As of time of writing (December 2015), AMD has marked the ACML
+as &#8220;end of life&#8221;, and suggests using the <a class="reference external" href="http://developer.amd.com/tools-and-sdks/opencl-zone/acl-amd-compute-libraries/">AMD compute libraries</a> instead.</p>
+<p>The ACML does not appear to contain a <a class="reference external" href="http://www.prism.gatech.edu/~ndantam3/cblas-doc/doc/html/main.html">CBLAS</a> interface.</p>
+<p>Binaries linked against ACML have to conform to the <a class="reference external" href="http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/ACML_June_24_2010_v2.pdf">ACML license</a>
+which, as for the MKL, requires software linked to the ACML to subject users
+to the ACML license terms including:</p>
+<blockquote>
+<div><p>2. Restrictions. The Software contains copyrighted and patented
+material, trade secrets and other proprietary material. In order to
+protect them, and except as permitted by applicable legislation, you
+may not:</p>
+<p>a) decompile, reverse engineer, disassemble or otherwise reduce the
+Software to a human-perceivable form;</p>
+<p>b) modify, network, rent, lend, loan, distribute or create derivative
+works based upon the Software in whole or in part [...]</p>
+</div></blockquote>
+</div>
+<div class="section" id="amd-compute-libraries">
+<h2>AMD compute libraries<a class="headerlink" href="#amd-compute-libraries" title="Permalink to this headline">¶</a></h2>
+<p>AMD advertise the <a class="reference external" href="http://developer.amd.com/tools-and-sdks/opencl-zone/acl-amd-compute-libraries/">AMD compute libraries</a> (ACL) as the successor to the ACML.</p>
+<p>The ACL page points us to <span class="xref std std-ref">blis</span> for BLAS and <span class="xref std std-ref">libflame</span> for LAPACK.</p>
+</div>
+<div class="section" id="blas-like-instantiation-software-framework">
+<span id="blis"></span><h2>BLAS-like instantiation software framework<a class="headerlink" href="#blas-like-instantiation-software-framework" title="Permalink to this headline">¶</a></h2>
+<p><a href="#id16"><span class="problematic" id="id17">BLIS_</span></a> is &#8220;a portable software framework for instantiating high-performance BLAS-like dense linear algebra libraries.&#8221;</p>
+<p>It provides a <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#im-not-really-interested-in-all-of-these-newfangled-features-in-blis-can-i-just-use-blis-as-a-blas-library">superset of BLAS</a>,
+along with a <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#what-about-cblas">CBLAS layer</a>.</p>
+<p>It can be compiled into a BLAS library. As of writing (December 2015) <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#can-i-build-blis-on-windows--mac-os-x">Windows
+builds are experimental</a>.
+BLIS <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#does-blis-automatically-detect-my-hardware">does not currently do run-time hardware detection</a>.</p>
+<p>As of December 2015 the <a class="reference external" href="https://groups.google.com/forum/#!forum/blis-devel">developer mailing list</a> was fairly quiet, with
+only a few emails since August 2015.</p>
+<p>Advantages:</p>
+<ul class="simple">
+<li>portable across platforms;</li>
+<li>modern architecture.</li>
+</ul>
+<p>Disadvantages:</p>
+<ul class="simple">
+<li>Windows builds are experimental;</li>
+<li>No runtime hardware detection.</li>
+</ul>
+</div>
+<div class="section" id="libflame">
+<span id="id2"></span><h2>libflame<a class="headerlink" href="#libflame" title="Permalink to this headline">¶</a></h2>
+<p><a href="#id18"><span class="problematic" id="id19">`libflame`_</span></a> is an implementation of some LAPACK routines. See the <a class="reference external" href="http://www.cs.utexas.edu/~flame/web/libFLAME.html">libflame
+project page</a> for more
+detail.</p>
+<p>libflame can also a full LAPACK implementation.  It is a sister project to
+BLIS.</p>
+</div>
+<div class="section" id="coblas">
+<h2>COBLAS<a class="headerlink" href="#coblas" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/rljames/coblas">COBLAS</a> is a &#8220;Reference BLAS library in
+C99&#8221;, BSD license. A quick look at the code in April 2014 suggested it used
+very straightforward implementations that are not highly optimized.</p>
+</div>
+<div class="section" id="netlib-reference-implementation">
+<h2>Netlib reference implementation<a class="headerlink" href="#netlib-reference-implementation" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="http://www.netlib.org/blas">netlib BLAS</a> and <a class="reference external" href="http://www.netlib.org/lapack/index.html">netlib LAPACK</a>.</p>
+<p>Most available benchmarks (e.g <a class="reference external" href="http://cran.r-project.org/web/packages/gcbd/vignettes/gcbd.pdf">R benchmarks</a>, <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">BLAS
+LAPACK review</a>) show the reference BLAS / LAPACK to be considerably slower
+than any optimized library.</p>
+</div>
+<div class="section" id="eigen">
+<h2>Eigen<a class="headerlink" href="#eigen" title="Permalink to this headline">¶</a></h2>
+<p>_Eigen is &#8220;a C++ template library for linear algebra: matrices, vectors,
+numerical solvers, and related algorithms.&#8221;</p>
+<p>Mostly covered by the Mozilla Public Licence 2, but some features covered by
+the LGPL.  <a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=FAQ#Disabling_non_MPL2_features">Non-MPL2 features can be disabled</a></p>
+<p>It is technically possible to compile Eigen into a BLAS library, but there is
+currently no CBLAS interface.</p>
+<p>See <a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=FAQ#How_does_Eigen_compare_to_BLAS.2FLAPACK.3F">Eigen FAQ entry discussing BLAS / LAPACK</a>.</p>
+</div>
+<div class="section" id="gotoblas2">
+<h2>GotoBLAS2<a class="headerlink" href="#gotoblas2" title="Permalink to this headline">¶</a></h2>
+<p><a href="#id20"><span class="problematic" id="id21">GotoBLAS_</span></a> is the predecessor to <a class="reference external" href="http://www.openblas.net">OpenBLAS</a>.  It was a library written by
+Kazushige Goto, and released under a BSD license, but is no longer maintained.
+Goto now works for Intel. It was at or near the top of benchmarks on which it
+has been tested (e.g <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">BLAS LAPACK review</a> <a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=Benchmark">Eigen benchmarks</a>).  Like MKL and ACML,
+GotoBLAS2 chooses routines at runtime according to the processor. It does not
+detect modern processors (after 2011).</p>
+</div>
+<div class="section" id="openblas">
+<h2>OpenBLAS<a class="headerlink" href="#openblas" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://www.openblas.net">OpenBLAS</a> is a fork of GotoBLAS2 updated for newer processors.  It uses the
+3-clause BSD license.</p>
+<p><a class="reference external" href="http://julialang.org">Julia</a> uses OpenBLAS by default.</p>
+<p>See <a class="reference external" href="https://github.com/xianyi/OpenBLAS">OpenBLAS on github</a> for current code state.  It appears to be <a class="reference external" href="https://github.com/xianyi/OpenBLAS/pulls?direction=desc&amp;page=1&amp;sort=created&amp;state=closed">actively
+merging pull requests</a>.
+There have been some worries about bugs and lack of tests on the <a class="reference external" href="http://mail.scipy.org/pipermail/numpy-discussion/2014-March/069659.html">numpy
+mailing list</a>
+and the <a class="reference external" href="http://article.gmane.org/gmane.comp.gnu.octave.maintainers/38746">octave list</a>.</p>
+<p>It appears to be <a class="reference external" href="https://github.com/tmolteno/necpp/issues/18">fast on benchmarks</a>.</p>
+<p>OpenBLAS on Win32 seems to be quite stable. Some OpenBLAS issues on Win64 can
+be adressed with a single threaded version of that library.</p>
+<p>Advantages:</p>
+<ul class="simple">
+<li>at or near fastest implementation;</li>
+<li>runtime hardware detection.</li>
+</ul>
+<p>Disadvantages:</p>
+<ul class="simple">
+<li>questions about quality control.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">BLAS / LAPACK on Windows</a><ul>
+<li><a class="reference internal" href="#atlas">ATLAS</a></li>
+<li><a class="reference internal" href="#intel-math-kernel-library">Intel Math Kernel Library</a></li>
+<li><a class="reference internal" href="#amd-core-math-library">AMD Core Math Library</a></li>
+<li><a class="reference internal" href="#amd-compute-libraries">AMD compute libraries</a></li>
+<li><a class="reference internal" href="#blas-like-instantiation-software-framework">BLAS-like instantiation software framework</a></li>
+<li><a class="reference internal" href="#libflame">libflame</a></li>
+<li><a class="reference internal" href="#coblas">COBLAS</a></li>
+<li><a class="reference internal" href="#netlib-reference-implementation">Netlib reference implementation</a></li>
+<li><a class="reference internal" href="#eigen">Eigen</a></li>
+<li><a class="reference internal" href="#gotoblas2">GotoBLAS2</a></li>
+<li><a class="reference internal" href="#openblas">OpenBLAS</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/blas_lapack.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Carl Kleffner and collaborators.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/blas_lapack.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

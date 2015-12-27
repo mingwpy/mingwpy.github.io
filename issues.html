@@ -64,6 +64,28 @@ libraries, so the deployment of Python extensions is greatly improved.</p>
 shared runtimes to avoid problems with exception handling over DLL boundaries.</p>
 <p>For building typically Python extensions a customized static GCC toolchain is
 the best compromise IMHO.</p>
+<p><strong>Note from njs:</strong> This definitely sounds like the right thing to try
+initially, <em>but</em> it&#8217;s possible (likely?) that we&#8217;ll run into the <a class="reference external" href="http://stevedower.id.au/blog/building-for-python-3-5-part-two/">same
+problem that Steve Dower ran into with trying to set up MSVC to
+statically link the runtime code</a>,
+i.e., TLS keys are a limited resource, so if libgcc allocates any TLS
+keys at startup, and every extension module has its own copy of
+libgcc, then this puts a hard cap on how many Python extension modules
+can be loaded into a single process. Which is really bad (consider
+projects like Sage that make heavy use of Cython, and each Cython
+source file creates a separate extension...). Or at least, it&#8217;s really
+bad IF it&#8217;s a problem at all. In fact I have no idea whether libgcc
+allocates any TLS keys at startup &#8211; introspecting a handy copy of
+libgcc*.dll shows that it does contain references to <code class="docutils literal"><span class="pre">TlsAlloc</span></code>, but
+I don&#8217;t know whether they&#8217;re called under ordinary circumstances. So
+we should start with static linking, but have a fallback plan in case
+it doesn&#8217;t work.</p>
+<p>Worst case, I think our fallback plan is to switch back to dynamic
+linking, and require projects to use one of the standard dynamic
+linking strategies that we&#8217;ve discussed elsewhere. Possibly this means
+the mingwpy project will eventually want to start shipping a
+mingw-w64-runtime wheel, similar to what we&#8217;ve discussed doing with
+BLAS dlls, that projects could declare a dependency on.</p>
 </div>
 <div class="section" id="ms-gcc-abi-incompatibilities">
 <h2>MS / gcc ABI incompatibilities<a class="headerlink" href="#ms-gcc-abi-incompatibilities" title="Permalink to this headline">¶</a></h2>
@@ -72,8 +94,7 @@ the best compromise IMHO.</p>
 (2^2) byte stack alignment.</p>
 <p>Win64 X86_64 is not affected.  This issue is the major cause for segment
 faults on 32bit systems.</p>
-<p>The solution* is to use the <code class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></code> flag for
-compiling.</p>
+<p>The solution is to use the <code class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></code> flag for compiling.</p>
 <p>From:
 <a class="reference external" href="https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs">https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs</a></p>
 <blockquote>
@@ -335,35 +356,30 @@ libm implementation from bionic (Android&#8217;s libc).</p>
 Basically what would be needed is just copying these files into mingw-w64 plus
 build system updates.</p>
 </div>
-<div class="section" id="disutils-issues">
-<h2>Disutils issues<a class="headerlink" href="#disutils-issues" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="distutils-issues">
+<h2>Distutils issues<a class="headerlink" href="#distutils-issues" title="Permalink to this headline">¶</a></h2>
 <p>Mingw via Python distutils needs to link extension code to the correct Python
 library, e.g. <code class="docutils literal"><span class="pre">libpython27.dll</span></code>.  To do this, mingw needs a library
 definition file <code class="docutils literal"><span class="pre">libpython27.a</span></code>.  It is possible to create this file using
 the mingw-w64 tools.</p>
+<p><em>Query from njs: can&#8217;t we just use the python27.lib that&#8217;s shipped
+with CPython itself?</em></p>
 <p>numpy distutils currently needs patching to pass correct flags to compiler /
-linkg.</p>
+linker.</p>
 <p>How to return correct flags to mingw-w64, from Python built with MSVC?</p>
 </div>
 <div class="section" id="manifest-resources">
 <h2>Manifest resources<a class="headerlink" href="#manifest-resources" title="Permalink to this headline">¶</a></h2>
 <p>Solution is to extend the GCC toolchain with the Manifest resource files and
 ensure linkage with the help of the &#8216;specs&#8217; file.</p>
+<p><em>If this is the solution, then what&#8217;s the problem? Carl, could you add
+some text here elaborating? (and then delete this comment :-)) -njs</em></p>
 </div>
 <div class="section" id="blas-lapack-libraries">
 <h2>BLAS / LAPACK libraries<a class="headerlink" href="#blas-lapack-libraries" title="Permalink to this headline">¶</a></h2>
 <p>There is no silver bullet for the problem of finding fast, reliable BLAS and
-LAPACK routines with a suitable license. ! A trade-off between licence
-acceptance, performance and stability remains to be found. OpenBLAS on Win32
-seems to be quite stable. Some OpenBLAS issues on Win64 can be adressed with a
-single threaded version of that library.</p>
-<p>Problems with OpenBLAS.</p>
-<p>A small number of test failures with numpy / scipy.</p>
-<p>Consider ATLAS instead?</p>
-<p>MKL licensing appears to still require us (the wheel package authors) to
-require you (the wheel package users) not to reverse engineer the MKL
-binaries (an extra license restriction).  Package authors have to indemnify
-Intel against being sued by the package users.</p>
+LAPACK routines with a suitable license.</p>
+<p>See <a class="reference internal" href="blas_lapack.html"><em>BLAS / LAPACK on Windows</em></a>.</p>
 </div>
 <div class="section" id="partial-to-do-list">
 <h2>Partial to-do list<a class="headerlink" href="#partial-to-do-list" title="Permalink to this headline">¶</a></h2>
@@ -403,7 +419,7 @@ different processors or gcc compile farm.</li>
 <li><a class="reference internal" href="#choice-of-msvc-runtime">Choice of MSVC runtime</a></li>
 <li><a class="reference internal" href="#the-vs-14-2015-runtime">The VS 14 / 2015 runtime</a></li>
 <li><a class="reference internal" href="#math-precision-issues">Math precision issues</a></li>
-<li><a class="reference internal" href="#disutils-issues">Disutils issues</a></li>
+<li><a class="reference internal" href="#distutils-issues">Distutils issues</a></li>
 <li><a class="reference internal" href="#manifest-resources">Manifest resources</a></li>
 <li><a class="reference internal" href="#blas-lapack-libraries">BLAS / LAPACK libraries</a></li>
 <li><a class="reference internal" href="#partial-to-do-list">Partial to-do list</a></li>
