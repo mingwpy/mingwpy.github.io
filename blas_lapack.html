@@ -84,17 +84,18 @@ format, where we build three ATLAS libraries:</p>
 <li>with support for SSE3 instructions;</li>
 </ul>
 <p>We make three Windows <code class="docutils literal"><span class="pre">.exe</span></code> installers, one for each of these ATLAS
-versions, and then build a &#8220;superpack&#8221; installer that first checks the machine
-on which the installer is running, to find what instructions the CPU supports,
-and the installs the matching numpy / ATLAS package.</p>
-<p>There is no way of doing this when installing from a binary <a href="#id12"><span class="problematic" id="id13">wheel_</span></a>, because
-the wheel installation process consists of unpacking files to given
-destinations, and does not allow pre-install or post-install scripts.</p>
+versions, and then build a &#8220;superpack&#8221; installer from these three installers,
+that first checks the machine on which the superpack installer is running, to
+find what instructions the CPU supports, and then installs the matching numpy
+/ ATLAS package.</p>
+<p>There is no way of doing this when installing from binary <a class="reference external" href="https://pypi.python.org/pypi/wheel">wheels</a>, because the
+wheel installation process consists of unpacking files to given destinations,
+and does not allow pre-install or post-install scripts.</p>
 <p>One option would be to build a binary wheel with ATLAS that depends on SSE2
 instructions.  It seems that 99.5% of Windows machines have SSE2 (see:
-<cite>Windows versions</cite>).  It technically not difficult to put a check in the numpy
-<code class="docutils literal"><span class="pre">__init__.py</span></code> file to give a helpful error message and die when the CPU does
-not have SSE2:</p>
+<a class="reference external" href="https://github.com/numpy/numpy/wiki/Windows-versions">Windows versions</a>).  It is not technically difficult to put a check in the
+numpy <code class="docutils literal"><span class="pre">__init__.py</span></code> file to give a helpful error message and die when the
+CPU does not have SSE2:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">windll</span><span class="p">,</span> <span class="n">wintypes</span>
 <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
@@ -113,7 +114,7 @@ not have SSE2:</p>
 <div class="section" id="intel-math-kernel-library">
 <h2>Intel Math Kernel Library<a class="headerlink" href="#intel-math-kernel-library" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="https://software.intel.com/en-us/intel-mkl">MKL</a> has a reputation for being fast, particularly on Intel chips (see the
-<a href="#id14"><span class="problematic" id="id15">`MLK Wikipedia entry`_</span></a>). It has good performance on <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">benchmarks</a> across
+<a class="reference external" href="https://en.wikipedia.org/wiki/Math_Kernel_Library">MKL Wikipedia entry</a>). It has good performance on <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">benchmarks</a> across
 the range, <a class="reference external" href="http://www.agner.org/optimize/blog/read.php?i=49#49">except on AMD processors</a>.</p>
 <p>It is closed-source, but available for free under the <a class="reference external" href="https://software.intel.com/sites/campaigns/nest">Community licensing
 program</a>.</p>
@@ -136,12 +137,11 @@ modifications, derivative works or Your distribution of Your Product.</p>
 </li>
 </ol>
 </div></blockquote>
-<p>Clause iv above requires us to somehow get our users to agree to extra license
-terms. This is presumably not practical using an automated installation method
-like pip / pypi.  Clause v makes us, the developers responsible for legal cost
+<p>Clause iv does allow us numpyers (as we use the BSD license) to distribute
+wheels without asking the users to submit to extra licensing terms.
+Unfortunately clause v makes us, the developers, responsible for legal cost
 that could be very large.</p>
-<p>See discussions about <a class="reference external" href="http://numpy-discussion.10968.n7.nabble.com/Windows-wheels-using-MKL-td37097.html">MKL on numpy mailing
-list</a>
+<p>See discussions about <a class="reference external" href="http://numpy-discussion.10968.n7.nabble.com/Windows-wheels-using-MKL-td37097.html">MKL on numpy mailing list</a>
 and <a class="reference external" href="https://github.com/JuliaLang/julia/issues/4272">MKL on Julia issues</a>.</p>
 <p>Advantages:</p>
 <ul class="simple">
@@ -185,7 +185,7 @@ works based upon the Software in whole or in part [...]</p>
 </div>
 <div class="section" id="blas-like-instantiation-software-framework">
 <span id="blis"></span><h2>BLAS-like instantiation software framework<a class="headerlink" href="#blas-like-instantiation-software-framework" title="Permalink to this headline">¶</a></h2>
-<p><a href="#id16"><span class="problematic" id="id17">BLIS_</span></a> is &#8220;a portable software framework for instantiating high-performance BLAS-like dense linear algebra libraries.&#8221;</p>
+<p><a href="#id12"><span class="problematic" id="id13">BLIS_</span></a> is &#8220;a portable software framework for instantiating high-performance BLAS-like dense linear algebra libraries.&#8221;</p>
 <p>It provides a <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#im-not-really-interested-in-all-of-these-newfangled-features-in-blis-can-i-just-use-blis-as-a-blas-library">superset of BLAS</a>,
 along with a <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#what-about-cblas">CBLAS layer</a>.</p>
 <p>It can be compiled into a BLAS library. As of writing (December 2015) <a class="reference external" href="https://github.com/flame/blis/wiki/FAQ#can-i-build-blis-on-windows--mac-os-x">Windows
@@ -206,7 +206,7 @@ only a few emails since August 2015.</p>
 </div>
 <div class="section" id="libflame">
 <span id="id2"></span><h2>libflame<a class="headerlink" href="#libflame" title="Permalink to this headline">¶</a></h2>
-<p><a href="#id18"><span class="problematic" id="id19">`libflame`_</span></a> is an implementation of some LAPACK routines. See the <a class="reference external" href="http://www.cs.utexas.edu/~flame/web/libFLAME.html">libflame
+<p><a href="#id14"><span class="problematic" id="id15">`libflame`_</span></a> is an implementation of some LAPACK routines. See the <a class="reference external" href="http://www.cs.utexas.edu/~flame/web/libFLAME.html">libflame
 project page</a> for more
 detail.</p>
 <p>libflame can also a full LAPACK implementation.  It is a sister project to
@@ -237,7 +237,7 @@ currently no CBLAS interface.</p>
 </div>
 <div class="section" id="gotoblas2">
 <h2>GotoBLAS2<a class="headerlink" href="#gotoblas2" title="Permalink to this headline">¶</a></h2>
-<p><a href="#id20"><span class="problematic" id="id21">GotoBLAS_</span></a> is the predecessor to <a class="reference external" href="http://www.openblas.net">OpenBLAS</a>.  It was a library written by
+<p><a href="#id16"><span class="problematic" id="id17">GotoBLAS_</span></a> is the predecessor to <a class="reference external" href="http://www.openblas.net">OpenBLAS</a>.  It was a library written by
 Kazushige Goto, and released under a BSD license, but is no longer maintained.
 Goto now works for Intel. It was at or near the top of benchmarks on which it
 has been tested (e.g <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">BLAS LAPACK review</a> <a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=Benchmark">Eigen benchmarks</a>).  Like MKL and ACML,
