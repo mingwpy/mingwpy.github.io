@@ -123,6 +123,7 @@ html_theme_options = {
 # http://sphinx-doc.org/config.html#confval-html_sidebars
 html_sidebars = {
    '**': ['localtoc.html', 'searchbox.html'],
+   'index': ['globaltoc.html', 'searchbox.html'],
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
