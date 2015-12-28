@@ -119,6 +119,12 @@ html_theme_options = {
     'github_repo': 'mingwpy.github.io',
 }
 
+# Templates to render in sidebar, map of document names to templates list.
+# http://sphinx-doc.org/config.html#confval-html_sidebars
+html_sidebars = {
+   '**': ['localtoc.html', 'searchbox.html'],
+}
+
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
 
@@ -155,9 +161,6 @@ html_static_path = ['_static']
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
 #html_use_smartypants = True
-
-# Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
