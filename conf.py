@@ -109,14 +109,22 @@ todo_include_todos = False
 
 # -- Options for HTML output ----------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
 html_theme = 'alabaster'
 
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#html_theme_options = {}
+# Theme options are theme-specific. Alabaster options are documented at
+# https://pypi.python.org/pypi/alabaster
+html_theme_options = {
+    'github_banner': True,
+    'github_user': 'mingwpy',
+    'github_repo': 'mingwpy.github.io',
+}
+
+# Templates to render in sidebar, map of document names to templates list.
+# http://sphinx-doc.org/config.html#confval-html_sidebars
+html_sidebars = {
+   '**': ['localtoc.html', 'searchbox.html'],
+   'index': ['globaltoc.html', 'searchbox.html'],
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -154,9 +162,6 @@ html_static_path = ['_static']
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
 #html_use_smartypants = True
-
-# Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
