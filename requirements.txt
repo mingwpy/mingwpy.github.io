@@ -1,2 +1,2 @@
-sphinx >= 1.3.2
+sphinx
 ghp-import
