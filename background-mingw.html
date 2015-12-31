@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MinGW-w64 &mdash; mingwpy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
+    <link rel="up" title="Background" href="background.html" />
+    <link rel="next" title="BLAS / LAPACK on Windows" href="blas_lapack.html" />
+    <link rel="prev" title="Background" href="background.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="mingw-w64">
+<h1>MinGW-w64<a class="headerlink" href="#mingw-w64" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="why-choose-mingw-w64-over-mingw">
+<h2>Why choose mingw-w64 over mingw?<a class="headerlink" href="#why-choose-mingw-w64-over-mingw" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="glossary.html#term-mingw-w64"><span class="xref std std-term">mingw-w64</span></a> is a fork of the <a class="reference internal" href="glossary.html#term-mingw"><span class="xref std std-term">mingw</span></a> project.</p>
+<p>To date, numpy and scipy have used versions of the mingw compilers to create
+32-bit binary distributions on Windows.  mingw-w64 has some major advantages
+over mingw, including:</p>
+<ul class="simple">
+<li>support for compiling 64-bit extensions (as well as 32-bit);</li>
+<li>large file support;</li>
+<li>winpthread pthreads implementation, MIT licenced;</li>
+<li>more active development.</li>
+</ul>
+</div>
+<div class="section" id="the-mingw-w64-project">
+<h2>The mingw-w64 project<a class="headerlink" href="#the-mingw-w64-project" title="Permalink to this headline">¶</a></h2>
+<p>The mingw-w64 project releases the supporting files to allow the standard
+<a class="reference internal" href="glossary.html#term-gcc"><span class="xref std std-term">gcc</span></a> distribution to compile code that can:</p>
+<ul class="simple">
+<li>make many standard Windows API calls;</li>
+<li>link against standard <a class="reference internal" href="glossary.html#term-mscrt"><span class="xref std std-term">MSCRT</span></a> <a class="reference internal" href="glossary.html#term-runtime-library"><span class="xref std std-term">runtime library</span></a> files.</li>
+</ul>
+<p>Among the files the project provides are:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">mingw-w64-headers</span></code> – header files specific to the Windows
+implementation.</li>
+<li><code class="docutils literal"><span class="pre">mingw-w64-crt</span></code> – code for C / C++ runtime libraries (providing
+functions not directly or reliably available from the MSCRT);</li>
+<li><code class="docutils literal"><span class="pre">mingw-w64-libraries</span></code> – libraries for using POSIX threads (<a class="reference external" href="http://locklessinc.com/articles/pthreads_on_windows/">winpthreads</a>), working with MSVC
+symbol name mangling (<a class="reference external" href="http://mingw-w64.sourceforge.net/libmangle">libmangle</a>), Windows store compatibility
+(<a class="reference external" href="http://www.jbkempf.com/blog/post/2013/Technical-update-on-the-WinRT-port">winstorecompat</a>),
+structured exception handling (<a class="reference external" href="http://www.reactos.org/wiki/PSEH">pseh</a>);</li>
+<li><code class="docutils literal"><span class="pre">mingw-w64-tools</span></code> – tools for: generating DLL export definition
+(<code class="docutils literal"><span class="pre">def</span></code>) files (<a class="reference external" href="http://sourceforge.net/p/mingw-w64/wiki2/gendef">gendef</a>); working with the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Microsoft_Interface_Definition_Language">Microsoft Interface Description Language</a>
+(<a class="reference external" href="http://manpages.ubuntu.com/manpages/precise/man1/genidl.1.html">genidl</a>,
+<a class="reference external" href="http://manpages.ubuntu.com/manpages/precise/man1/widl.1.html">widl</a>);
+modifying <a class="reference external" href="https://en.wikipedia.org/wiki/Portable_Executable">PE</a> flags in Windows executable files (<cite>genpeimg</cite>).</li>
+</ul>
+<p>The project has official source releases on sourceforge: see <a class="reference external" href="http://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/">mingw-w64 source
+releases</a>.</p>
+<p>In order to use mingw-w64 implementations to compile real code, you will need
+a mingw-w64 compiler toolchain.</p>
+</div>
+<div class="section" id="the-compiler-toolchain">
+<h2>The compiler toolchain<a class="headerlink" href="#the-compiler-toolchain" title="Permalink to this headline">¶</a></h2>
+<p>To build software with mingw-w64 you will likely need:</p>
+<ul class="simple">
+<li>the compiler (gcc, compiled from standard gcc sources), augumented with the
+mingw-w64 extensions, including Windows-specific headers and runtime
+libraries;</li>
+<li>a build of the GNU <a class="reference internal" href="glossary.html#term-binutils"><span class="xref std std-term">binutils</span></a> tools, containing utility programs such
+as <code class="docutils literal"><span class="pre">ld</span></code>, <code class="docutils literal"><span class="pre">ar</span></code>, <code class="docutils literal"><span class="pre">dlltool</span></code>.</li>
+</ul>
+</div>
+<div class="section" id="c-exception-models">
+<h2>C++ exception models<a class="headerlink" href="#c-exception-models" title="Permalink to this headline">¶</a></h2>
+<p>The mingw-w64 compiler can be built with different ways of handling C++
+exceptions. See <a class="reference external" href="http://sourceforge.net/p/mingw-w64/wiki2/Exception%20Handling/">mingw-w64 exception handling</a> and <a class="reference external" href="http://stackoverflow.com/questions/15670169/what-is-difference-between-sjlj-vs-dwarf-vs-seh">SO post on mingw-w64
+exception handling</a> for background.</p>
+<p>The exception handling modes are:</p>
+<ul class="simple">
+<li>Dwarf2: only supported building for 32-bit Windows targets;</li>
+<li>setjmp / longjmp (SJLJ): &#8220;much slower than Dwarf2&#8221;, but compatible on 32 and
+64 bits;</li>
+<li><a class="reference external" href="https://www.microsoft.com/msj/0197/exception/exception.aspx">Structured exception handling</a> (SEH): the standard MSVC exception handling
+mechanism, <a class="reference external" href="http://thread.gmane.org/gmane.comp.gnu.mingw.w64.general/5920">supported in 64-bit GCC since version 4.8</a>.  SEH
+<a class="reference external" href="http://mingw-w64.org/doku.php/contribute">still not supported</a> for 32-bit
+targets.</li>
+</ul>
+</div>
+<div class="section" id="threading-models">
+<h2>Threading models<a class="headerlink" href="#threading-models" title="Permalink to this headline">¶</a></h2>
+<p>The mingw-w64 compiler can also be built with different threading models. The
+options are:</p>
+<ul class="simple">
+<li>POSIX threads (full C++11/C11 threading features);</li>
+<li>win32 threads (No C++11 multithreading features).</li>
+</ul>
+<p>See these SO posts:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://stackoverflow.com/questions/13212342/whats-the-difference-between-thread-posixs-and-thread-win32-in-gcc-port-of-windo">difference bewteen posix and win32 threads in mingw-w64</a></li>
+<li><a class="reference external" href="http://stackoverflow.com/questions/17242516/mingw-w64-threads-posix-vs-win32">posix vs win32</a></li>
+</ul>
+</div>
+<div class="section" id="a-more-complete-software-build-system">
+<h2>A more complete software build system<a class="headerlink" href="#a-more-complete-software-build-system" title="Permalink to this headline">¶</a></h2>
+<p>In practice, for building software, you will usually want a wider range of
+tools than just the compiler and binutils utilities.  In particular you will
+probably want tools like the <code class="docutils literal"><span class="pre">bash</span></code> shell, <code class="docutils literal"><span class="pre">make</span></code>, and the <a class="reference external" href="https://en.wikipedia.org/wiki/GNU_build_system">GNU build
+system</a>.</p>
+<p><a class="reference external" href="http://sourceforge.net/projects/msys2/">MSYS2</a> provides these.  msys2 is the successor of msys. Msys2 is necessary as
+environment for the mingw build process on Windows.  -
+<a class="reference external" href="http://sourceforge.net/p/msys2/wiki/MSYS2%20installation/">http://sourceforge.net/p/msys2/wiki/MSYS2%20installation/</a></p>
+</div>
+<div class="section" id="official-mingw-w64-gcc-toolchains">
+<h2>Official mingw-w64 GCC toolchains<a class="headerlink" href="#official-mingw-w64-gcc-toolchains" title="Permalink to this headline">¶</a></h2>
+<p>&#8216;recommended&#8217; builds are available from the mingw-builds project at
+<a class="reference external" href="http://mingw-w64.sourceforge.net/download.php#mingw-builds">http://mingw-w64.sourceforge.net/download.php#mingw-builds</a> for example:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh">64-bit target, SEH exceptions, posix threads</a></li>
+<li><a class="reference external" href="http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/4.8.2/threads-posix/dwarf">32-bit target, dwarf 2 exceptions, posix threads</a></li>
+</ul>
+<p>These are common combinations of exception and thread models. You can find
+other combinations as well. Exception handling affects C++ development. Don&#8217;t
+ever link object code with different types of exception and/or thread
+handling!</p>
+<p>Threads concerning the question &#8216;where to find mingw-w64 builds&#8217;:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://article.gmane.org/gmane.comp.gnu.mingw.w64.general/7700">http://article.gmane.org/gmane.comp.gnu.mingw.w64.general/7700</a></li>
+<li><a class="reference external" href="http://article.gmane.org/gmane.comp.gnu.mingw.w64.general/8484">http://article.gmane.org/gmane.comp.gnu.mingw.w64.general/8484</a></li>
+</ul>
+</div>
+<div class="section" id="other-sources-of-precompiled-mingw-w64-compiled-libraries">
+<h2>Other sources of precompiled mingw-w64 compiled libraries<a class="headerlink" href="#other-sources-of-precompiled-mingw-w64-compiled-libraries" title="Permalink to this headline">¶</a></h2>
+<p>Recent mingw-w64 based tools and library packages together with sources and
+patches are available from archlinux as well as from the msys2 maintainers.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://sourceforge.net/projects/mingw-w64-archlinux/files/">http://sourceforge.net/projects/mingw-w64-archlinux/files/</a>  (i686: Sjlj | x86_64: SEH)</li>
+<li><a class="reference external" href="http://sourceforge.net/projects/msys2/files/REPOS/MINGW/">http://sourceforge.net/projects/msys2/files/REPOS/MINGW/</a>  (i686: Dwarf | x86_64: SEH)</li>
+</ul>
+<p>See also <a class="reference external" href="http://wiki.qt.io/MinGW-64-bit">this mingw-w64 writeup for Qt</a>.</p>
+</div>
+<div class="section" id="building-a-mingw-w64-based-gcc-toolchain-on-windows">
+<h2>Building a mingw-w64 based GCC toolchain on Windows<a class="headerlink" href="#building-a-mingw-w64-based-gcc-toolchain-on-windows" title="Permalink to this headline">¶</a></h2>
+<p>&#8220;mingw-builds&#8221; is a set of scripts and patches for compiling the GCC toolchain
+under Windows with the help of msys2 POSIX environment -
+<a class="reference external" href="https://github.com/niXman/mingw-builds/tree/develop">https://github.com/niXman/mingw-builds/tree/develop</a> recent &#8216;mingw-builds&#8217; GCC
+toolchains can be downloaded from the mingw-w64 sf.net site:
+<a class="reference external" href="http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/">http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">MinGW-w64</a><ul>
+<li><a class="reference internal" href="#why-choose-mingw-w64-over-mingw">Why choose mingw-w64 over mingw?</a></li>
+<li><a class="reference internal" href="#the-mingw-w64-project">The mingw-w64 project</a></li>
+<li><a class="reference internal" href="#the-compiler-toolchain">The compiler toolchain</a></li>
+<li><a class="reference internal" href="#c-exception-models">C++ exception models</a></li>
+<li><a class="reference internal" href="#threading-models">Threading models</a></li>
+<li><a class="reference internal" href="#a-more-complete-software-build-system">A more complete software build system</a></li>
+<li><a class="reference internal" href="#official-mingw-w64-gcc-toolchains">Official mingw-w64 GCC toolchains</a></li>
+<li><a class="reference internal" href="#other-sources-of-precompiled-mingw-w64-compiled-libraries">Other sources of precompiled mingw-w64 compiled libraries</a></li>
+<li><a class="reference internal" href="#building-a-mingw-w64-based-gcc-toolchain-on-windows">Building a mingw-w64 based GCC toolchain on Windows</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Carl Kleffner and collaborators.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/background-mingw.rst"
+          rel="nofollow">Edit on GitHub</a>
+    </div>
+
+    
+    <a href="https://github.com/mingwpy/mingwpy.github.io" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

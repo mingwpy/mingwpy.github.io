@@ -20,7 +20,15 @@ Contents
     :maxdepth: 1
 
     motivation
+
+.. toctree::
+    :maxdepth: 2
+
     background
+
+.. toctree::
+    :maxdepth: 1
+
     issues
     mingwpy
     glossary
