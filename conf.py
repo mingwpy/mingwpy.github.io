@@ -108,6 +108,14 @@ todo_include_todos = False
 
 
 # -- Options for HTML output ----------------------------------------------
+try:
+    # The alabaster theme was only included in Sphinx 1.3; it's also a
+    # separate package
+    import alabaster
+    html_theme_path = [alabaster.get_path()]
+    extensions = ['alabaster']
+except ImportError:
+    pass
 
 html_theme = 'alabaster'
 
