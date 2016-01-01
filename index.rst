@@ -31,6 +31,7 @@ Contents
 
     issues
     mingwpy
+    roadmap
     glossary
 
 .. hidden toctree suppresses warnings about not-included documents
