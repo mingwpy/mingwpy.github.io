@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Funding request - MinGW-w64 static toolchain &mdash; mingwpy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
+    <link rel="up" title="Roadmap" href="roadmap.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="Roadmap" href="roadmap.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="funding-request-mingw-w64-static-toolchain">
+<h1>Funding request - MinGW-w64 static toolchain<a class="headerlink" href="#funding-request-mingw-w64-static-toolchain" title="Permalink to this headline">¶</a></h1>
+<p>Authors: Ralf Gommers, Matthew Brett, Nathaniel Smith, Olivier Grisel and Carl Kleffner</p>
+<div class="section" id="executive-summary">
+<h2>Executive summary<a class="headerlink" href="#executive-summary" title="Permalink to this headline">¶</a></h2>
+<p><strong>Grant objective</strong>: provide a modern, freely available, easy to install
+compiler toolchain that allows building and distributing the scientific Python
+stack on Windows.</p>
+<p><strong>Problem statement</strong>: the situation with building the scientific Python stack
+on Windows is reaching breaking point.  There is no freely available compiler
+toolchain that can be used to build 64-bit installers for Scipy or any Scipy
+installers for Python 3.5. There are no Windows wheels for Numpy, Scipy and
+many other projects on PyPi. Windows issues are a major burden for release
+managers.</p>
+<p><strong>Key benefits</strong> for end users expected to be quickly realized after achieving
+the objective of this grant are:</p>
+<ul class="simple">
+<li>make official 64-bit Windows binary installers for the core Scipy Stack;</li>
+<li>enable Numpy and Scipy Windows wheels on PyPi;</li>
+<li>clear path for other scientific Python projects to support Windows wheels on Pypi.</li>
+</ul>
+<p>For developers the key benefits are:</p>
+<ul class="simple">
+<li>provide a usable free, easy to install compiler toolchain on Windows, thus
+increasing the pool of developers who can support Windows builds;</li>
+<li>provide a way forward for Python 3.5;</li>
+<li>move beyond Fortran 77.</li>
+</ul>
+<p><strong>Funding request</strong>: We request $5k in total from NumFOCUS, $1k of which to
+come from Numpy/Scipy funds, as well as endorsement of a request for $5k to the
+PSF working group for Python in Scientific Computing and Data Analysis.</p>
+</div>
+<div class="section" id="context">
+<h2>Context<a class="headerlink" href="#context" title="Permalink to this headline">¶</a></h2>
+<p>Python.org Windows installers are built with specific versions of Microsoft
+Visual C++ (MSVC).  When we build extension modules with MSVC, we need the
+specific version of MSVC with which Python was compiled.  Thus building
+extensions for each of Python 2.7, 3.4 and 3.5 needs a different copy of MSVC
+installed and configured <a class="reference external" href="https://matthew-brett.github.io/pydagogue/python_msvc.html">[10]</a> .  Installation and configuration is not always
+easy.   Although it is possible to find freely available versions of MSVC for
+these Pythons, there is no freely available Fortran compiler, making it
+impossible to build Scipy and other packages depending on Fortran code.</p>
+<p>For these reasons, Numpy and Scipy have been using a Windows GCC toolchain
+based on MinGW for their public releases.  However, the MinGW project is now
+dormant and the toolchain is aging.  Symptoms of this aging are that it does
+not support 64-bit compilation or versions of Fortran beyond f77.</p>
+<p>The obvious replacement for MinGW is the newer MinGW-w64 project.  This does
+support 64-bit compilation and modern GFortran.  However, there are problems to
+overcome in configuring MinGW-w64 to compile extensions with acceptable
+mathematical precision and compatibility with code compiled with MSVC.</p>
+<p>Carl Kleffner has been working on solving these and other problems for the last
+2 years <a class="reference external" href="https://cournape.wordpress.com/2009/06/28/progress-for-numpy-on-windows-64-bits/">[5]</a>.  His current MinGW-w64-based toolchain is capable of building the
+core packages of the Scipy stack (see <a class="reference external" href="https://github.com/numpy/numpy/issues/5194">[6]</a>, <a class="reference external" href="https://github.com/numpy/numpy/wiki/Mingw-static-toolchain">[7]</a>); there are rough edges however.
+The aim of this proposal is to document this toolchain, and make it
+user-friendly and maintainable, in order for the scientific Python community to
+be able to switch to it for the Windows binaries of the releases of its core
+projects.  There is significant work involved in achieving this
+user-friendliness and maintainability to the level required for acceptance by
+the core Scipy Stack projects.  Furthermore, significant work is needed to
+support MSVC 2015 - needed to support Python 3.5 and up.  This effort requires
+funding, to allow Carl Kleffner (the proposed contractor) to spend more time
+on it than only spare hours in the evening.</p>
+</div>
+<div class="section" id="funding-request-details">
+<h2>Funding request details<a class="headerlink" href="#funding-request-details" title="Permalink to this headline">¶</a></h2>
+<p>The overall funding request for the planned work is split in 3 phases, for a
+total amount of $10000. The request for the first phase is $1000; for the
+second phase $4000 and for the third phase $5000.  There are several reasons
+for this phasing:</p>
+<ol class="arabic simple">
+<li>Enable fast approval of the phase 1 and phase 2 requests.  The aim is to get
+started with the work as soon as possible (target: 1 Jan 2016).</li>
+<li>Allow a split in funding sources.  The request for phase 1 is to NumFOCUS
+(funds donated to Numpy/Scipy), phase 2 also to NumFOCUS (non-project
+funds), while for phase 3 it will be to the PSF fund for scientific Python
+related grants.</li>
+<li>Good progress during phases 1 and 2 will build confidence that the final
+goals of the larger phase 3 request will be met.</li>
+</ol>
+<p>As stated above, the request to NumFOCUS now is to approve the phase 1 request
+of $1000 and the phase 2 request of $4000.  In light of the significance of
+this work for the whole Scipy Stack, the Numpy and Scipy projects are willing
+to together contribute $1000 of the funds donated to them via NumFOCUS, which
+covers phase 1.</p>
+<p>The proposal is to execute the work on a contractor basis, with a set of
+milestones to be achieved for each tranche of funds.  The contractor will be
+Carl Kleffner.  The other people involved in the work, to support Carl
+and act as community liaisons, are:</p>
+<ul class="simple">
+<li>Matthew Brett (MingwPy project - community &amp; open sourcing aspects)</li>
+<li>Nathaniel Smith (lead interaction with upstream MinGW-w64)</li>
+<li>Ralf Gommers (support numpy.distutils / setuptools integration)</li>
+<li>Olivier Grisel (toolchain reproducibility &amp; Windows CI)</li>
+</ul>
+<p><strong>Main milestones</strong> for phase 1:</p>
+<ol class="arabic simple">
+<li>Patches and a build script for the static toolchains are made available
+publicly. Build doesn’t have to be fully automated, but (with some help from
+Carl if needed) can be reproduced by at least one other person.</li>
+</ol>
+<p>For phase 2:</p>
+<ol class="arabic simple" start="2">
+<li>MingwPy project is set up under the MingwPy Github org <a class="reference external" href="https://github.com/mingwpy">[4]</a> and contains
+documented, maintainable build scripts for the toolchain itself.</li>
+<li>Numpy and Scipy master branches can be built with that toolchain for Python
+2.7, win32 + win64, with at most some test failures due to limited numerical
+precision left (those will be addressed in phase 3).</li>
+<li>Continuous integration is set up on one of Appveyor or TravisCI with the
+toolchain for Numpy, Scipy and scikit-learn.</li>
+<li>Design documentation explaining the high-level design and choices made
+related to linking against MSVC runtimes, threading model, exception
+handling and floating point library support.</li>
+</ol>
+<p>And for phase 3:</p>
+<ol class="arabic simple" start="6">
+<li>Numerical precision of toolchain is improved to the extent that the full
+Numpy and Scipy test suites pass.</li>
+<li>Toolchain is installable as one or more wheels from PyPi with &#8220;pip install mingwpy&#8221;.</li>
+<li>A working prototyped solution for Python 3.5 is demonstrated.  The main
+principles of the solution are required to be acceptable to upstream MinGW-w64,
+however the prototype does not have to be in a state that&#8217;s completely ready
+for integration upstream (this is more work, and is dependent on upstream).</li>
+</ol>
+</div>
+<div class="section" id="detailed-problem-statement">
+<h2>Detailed problem statement<a class="headerlink" href="#detailed-problem-statement" title="Permalink to this headline">¶</a></h2>
+<p>The current 32-bit Windows installers for Numpy and Scipy are built with MinGW
+3.4.5 (see <a class="reference external" href="https://github.com/numpy/numpy-vendor">[2]</a> for details). They’re compiled against three variants of ATLAS,
+which differ in the instruction sets they support (no SSE, SS2 or SSE3). The
+installers are .exe files with a GUI, and therefore cannot be used in batch
+installed. Building wheels for these ATLAS based builds isn’t possible; the
+wheel format doesn’t support selecting the right instruction set at install
+time. Having no Windows wheels for Numpy and Scipy on PyPy has also blocked
+many other projects from providing Windows wheels. The difficulty of building
+Windows installers is a major burden on release managers for scientific Python
+projects.</p>
+<p>Development of core libraries like NumPy and SciPy is hobbled by the need to
+work around bugs and limitations of old compilers (e.g., lack of support for
+C99 and Fortran 95). Issues with the current outdated MinGW setup are the main
+bottleneck in making releases, and regularly lead to delays of a month or more.
+Windows CI isn’t available, therefore build issues and test failures are
+usually detected too late.</p>
+<p>Another important issue is that Cython, and related technologies that depend on
+a working compiler, is hard to use in introductory classes because setting up
+the Microsoft Visual Studio compilers is difficult and error-prone.</p>
+</div>
+<div class="section" id="more-on-proposed-work">
+<h2>More on proposed work<a class="headerlink" href="#more-on-proposed-work" title="Permalink to this headline">¶</a></h2>
+<p>The work to achieve the milestones listed above will land in the Github MingwPy
+org <a class="reference external" href="https://github.com/mingwpy">[4]</a>; documentation is already being set up at <a class="reference external" href="http://mingwpy.github.io/">[9]</a>.</p>
+<p>The target for supported Python versions is 2.7 and 3.5.  Python 2.7 support
+must work but is not required to be pushed to upstream MinGW-w64.  For Python
+3.5 (and up), upstream MinGW-w64 support for the universal common runtime in
+MSVC 2015 is necessary in order to have a situation that&#8217;s maintainable longer
+term.</p>
+<div class="section" id="additional-benefits">
+<h3>Additional benefits<a class="headerlink" href="#additional-benefits" title="Permalink to this headline">¶</a></h3>
+<p>There are a number of benefits in addition to the ones mentioned in the
+<em>executive summary</em>. These are:</p>
+<ul class="simple">
+<li>Having a pip-installable compiler makes it significantly easier to work and
+teach with Cython.</li>
+<li>A pip-installable compiler also makes setting up Windows CI feasible for
+Scipy.</li>
+<li>Windows 32-bit builds will use the same MinGW-w64 based toolchain and
+therefore move from GCC 3.4.5 and g77 to GCC/GFortran &gt;= 4.92. This allows
+the use of Fortran 90/95 code.</li>
+<li>OpenBLAS is currently the best option for a high performance open source
+BLAS/LAPACK implementation. The work in this proposal would enable using
+OpenBLAS instead of ATLAS.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="technical-background">
+<h2>Technical background<a class="headerlink" href="#technical-background" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="why-a-static-gcc-toolchain">
+<h3>Why a static GCC toolchain?<a class="headerlink" href="#why-a-static-gcc-toolchain" title="Permalink to this headline">¶</a></h3>
+<p>GCC as well as the all necessary libraries for a tool chain can be compiled
+with the <em>-disabled-shared</em> option at configure time. The GCC runtime object
+code will be statically linked into the binaries. As a consequence no
+dependencies to external GCC runtime libraries will be created. Deployment of
+Python extensions is therefore greatly improved.</p>
+</div>
+<div class="section" id="considered-alternatives">
+<h3>Considered alternatives<a class="headerlink" href="#considered-alternatives" title="Permalink to this headline">¶</a></h3>
+<p>Two alternative options to improve the build situation on Windows were
+considered:</p>
+<ol class="arabic simple">
+<li>Making GFortran work with MSVC directly.</li>
+<li>A free solution involving Intel MKL and Intel compilers.</li>
+</ol>
+<p>Option (1) is potentially easier to maintain than the proposed work (see
+<a class="reference external" href="https://cournape.wordpress.com/2009/06/28/progress-for-numpy-on-windows-64-bits/">[5]</a> for a report of some experimentation in this direction done in 2009).
+However, this would rely on MSVC remaining freely available, which is not a
+given.  It also would not provide all the benefits that this proposal brings:
+the toolchain wouldn’t be pip-installable, and it wouldn’t support C99.
+Finally: no one is working on this, while significant work has already been
+done on the MinGW-w64 toolchain.</p>
+<p>Option (2) has been explored, but isn’t feasible. MKL is now free, but ifort
+(the Intel Fortran compiler) not yet. So that&#8217;s still not a free toolchain.  In
+addition, there are legal issues with distributing the binaries even if ifort
+would become free.  There has been contact with Intel; our conclusion was that
+there is little chance that a free solution will be made available by Intel in
+the near future. (In fact, our contacts at Intel have encouraged us to move
+ahead with the MinGW-w64 solution, and helped us locate BSD-licensed code to
+improve the numerical precision issues that was previously contributed by Intel
+to Android.)</p>
+</div>
+<div class="section" id="details-on-mingw-w64-the-static-toolchain">
+<h3>Details on MinGW-w64 &amp; the static toolchain<a class="headerlink" href="#details-on-mingw-w64-the-static-toolchain" title="Permalink to this headline">¶</a></h3>
+<p>There are several mutually incompatible 64-bit MinGW-based toolchains being
+distributed. The most active and promising project is MinGW-w64 <a class="reference external" href="http://sourceforge.net/projects/mingw-w64/">[8]</a>.
+Therefore the static toolchain will be based on this project.</p>
+<p>The static toolchains (separate ones for 32-bit and 64-bit) have to be built on
+Windows, in the MSYS2 Posix shell. Cross-compiling on LINUX is under
+examination, but isn’t a priority.</p>
+<p>Customizations not present in the standard MinGW-w64 releases include:</p>
+<ul class="simple">
+<li>dedicated GCC tool chains for both 32-bit (win32 thread model, sljl
+exceptions) and 64 bit (win32 thread model, SEH exceptions)</li>
+<li>statically build tool chain based on gcc-4.9.2 and MinGW-w64 v4 (trunk)</li>
+<li>&#8216;specs&#8217; files provided for MSVCR90/100 linkage and manifest support</li>
+<li>OpenBLAS &gt;= 2.12 (optimized BLAS, LAPACK) with windows threads model support</li>
+</ul>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<p>[1] <a class="reference external" href="https://bitbucket.org/carlkl/mingw-w64-for-python/downloads">https://bitbucket.org/carlkl/mingw-w64-for-python/downloads</a></p>
+<p>[2] <a class="reference external" href="https://github.com/numpy/numpy-vendor">https://github.com/numpy/numpy-vendor</a></p>
+<p>[3] <a class="reference external" href="https://github.com/scipy/scipy/issues/2829">https://github.com/scipy/scipy/issues/2829</a></p>
+<p>[4] <a class="reference external" href="https://github.com/mingwpy">https://github.com/mingwpy</a></p>
+<p>[5] <a class="reference external" href="https://cournape.wordpress.com/2009/06/28/progress-for-numpy-on-windows-64-bits/">https://cournape.wordpress.com/2009/06/28/progress-for-numpy-on-windows-64-bits/</a></p>
+<p>[6] <a class="reference external" href="https://github.com/numpy/numpy/issues/5194">https://github.com/numpy/numpy/issues/5194</a></p>
+<p>[7] <a class="reference external" href="https://github.com/numpy/numpy/wiki/Mingw-static-toolchain">https://github.com/numpy/numpy/wiki/Mingw-static-toolchain</a></p>
+<p>[8] <a class="reference external" href="http://sourceforge.net/projects/mingw-w64/">http://sourceforge.net/projects/mingw-w64/</a></p>
+<p>[9] <a class="reference external" href="http://mingwpy.github.io/">http://mingwpy.github.io/</a></p>
+<p>[10] <a class="reference external" href="https://matthew-brett.github.io/pydagogue/python_msvc.html">https://matthew-brett.github.io/pydagogue/python_msvc.html</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Funding request - MinGW-w64 static toolchain</a><ul>
+<li><a class="reference internal" href="#executive-summary">Executive summary</a></li>
+<li><a class="reference internal" href="#context">Context</a></li>
+<li><a class="reference internal" href="#funding-request-details">Funding request details</a></li>
+<li><a class="reference internal" href="#detailed-problem-statement">Detailed problem statement</a></li>
+<li><a class="reference internal" href="#more-on-proposed-work">More on proposed work</a><ul>
+<li><a class="reference internal" href="#additional-benefits">Additional benefits</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#technical-background">Technical background</a><ul>
+<li><a class="reference internal" href="#why-a-static-gcc-toolchain">Why a static GCC toolchain?</a></li>
+<li><a class="reference internal" href="#considered-alternatives">Considered alternatives</a></li>
+<li><a class="reference internal" href="#details-on-mingw-w64-the-static-toolchain">Details on MinGW-w64 &amp; the static toolchain</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Carl Kleffner and collaborators.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/proposal_december2015.rst"
+          rel="nofollow">Edit on GitHub</a>
+    </div>
+
+    
+    <a href="https://github.com/mingwpy/mingwpy.github.io" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
