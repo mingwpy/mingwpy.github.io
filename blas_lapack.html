@@ -43,7 +43,7 @@
 <h1>BLAS / LAPACK on Windows<a class="headerlink" href="#blas-lapack-on-windows" title="Permalink to this headline">¶</a></h1>
 <p>Windows has no default <a class="reference external" href="http://www.netlib.org/blas/">BLAS</a> / <a class="reference external" href="http://www.netlib.org/lapack/">LAPACK</a> library.  By &#8220;default&#8221; we mean,
 installed with the operating system.</p>
-<p>Numpy needs a BLAS library that has <a class="reference external" href="http://www.prism.gatech.edu/~ndantam3/cblas-doc/doc/html/main.html">CBLAS</a> C language wrappers.</p>
+<p>Numpy needs a BLAS library that has <a class="reference external" href="http://www.netlib.org/blas/#_cblas">CBLAS</a> C language wrappers.</p>
 <p>Here is a list of the options that we know about.</p>
 <div class="section" id="atlas">
 <h2>ATLAS<a class="headerlink" href="#atlas" title="Permalink to this headline">¶</a></h2>
@@ -58,7 +58,7 @@ routines at runtime but at build time, meaning that a default ATLAS build can
 be badly optimized for a particular processor.  The main developer of ATLAS is
 Clint Whaley.  His main priority is optimizing for HPC machines, and he does
 not give much time to supporting Windows builds.  Not surprisingly, ATLAS is
-difficult to build on Windows, and is <a class="reference external" href="http://math-atlas.sourceforge.net/atlas_install/node57">not well optimized for Windows 64 bit</a>.</p>
+difficult to build on Windows, and is <a class="reference external" href="http://math-atlas.sourceforge.net/atlas_install/node57.html">not well optimized for Windows 64 bit</a>.</p>
 <p>Advantages:</p>
 <ul class="simple">
 <li>Very reliable;</li>
@@ -163,7 +163,7 @@ CPUs.</li>
 <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">moderately worse</a>
 performance.  As of time of writing (December 2015), AMD has marked the ACML
 as &#8220;end of life&#8221;, and suggests using the <a class="reference external" href="http://developer.amd.com/tools-and-sdks/opencl-zone/acl-amd-compute-libraries/">AMD compute libraries</a> instead.</p>
-<p>The ACML does not appear to contain a <a class="reference external" href="http://www.prism.gatech.edu/~ndantam3/cblas-doc/doc/html/main.html">CBLAS</a> interface.</p>
+<p>The ACML does not appear to contain a <a class="reference external" href="http://www.netlib.org/blas/#_cblas">CBLAS</a> interface.</p>
 <p>Binaries linked against ACML have to conform to the <a class="reference external" href="http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/ACML_June_24_2010_v2.pdf">ACML license</a>
 which, as for the MKL, requires software linked to the ACML to subject users
 to the ACML license terms including:</p>
@@ -222,7 +222,7 @@ very straightforward implementations that are not highly optimized.</p>
 <div class="section" id="netlib-reference-implementation">
 <h2>Netlib reference implementation<a class="headerlink" href="#netlib-reference-implementation" title="Permalink to this headline">¶</a></h2>
 <p>See <a class="reference external" href="http://www.netlib.org/blas">netlib BLAS</a> and <a class="reference external" href="http://www.netlib.org/lapack/index.html">netlib LAPACK</a>.</p>
-<p>Most available benchmarks (e.g <a class="reference external" href="http://cran.r-project.org/web/packages/gcbd/vignettes/gcbd.pdf">R benchmarks</a>, <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">BLAS
+<p>Most available benchmarks (e.g <a class="reference external" href="https://cran.r-project.org/web/packages/gcbd/vignettes/gcbd.pdf">R benchmarks</a>, <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">BLAS
 LAPACK review</a>) show the reference BLAS / LAPACK to be considerably slower
 than any optimized library.</p>
 </div>
@@ -238,7 +238,7 @@ currently no CBLAS interface.</p>
 </div>
 <div class="section" id="gotoblas2">
 <h2>GotoBLAS2<a class="headerlink" href="#gotoblas2" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://www.tacc.utexas.edu/tacc-projects/gotoblas2">GotoBLAS2</a> is the predecessor to <a class="reference external" href="http://www.openblas.net">OpenBLAS</a>.  It was a library written by
+<p><a class="reference external" href="https://www.tacc.utexas.edu/research-development/tacc-software/gotoblas2">GotoBLAS2</a> is the predecessor to <a class="reference external" href="http://www.openblas.net">OpenBLAS</a>.  It was a library written by
 <a class="reference external" href="https://en.wikipedia.org/wiki/Kazushige_Goto">Kazushige Goto</a>, and released
 under a BSD license, but is no longer maintained.  Goto now works for Intel.
 It was at or near the top of benchmarks on which it has been tested (e.g <a class="reference external" href="http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf">BLAS
