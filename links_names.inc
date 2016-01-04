@@ -27,7 +27,7 @@
 .. _MKL wikipedia entry: https://en.wikipedia.org/wiki/Math_Kernel_Library
 .. _OpenBLAS: http://www.openblas.net
 .. _OpenBLAS on github: https://github.com/xianyi/OpenBLAS
-.. _CBLAS: http://www.prism.gatech.edu/~ndantam3/cblas-doc/doc/html/main.html
+.. _CBLAS: http://www.netlib.org/blas/#_cblas
 .. _AMD core math library:
 .. _ACML:
    http://developer.amd.com/tools-and-sdks/cpu-development/amd-core-math-library-acml
@@ -38,7 +38,8 @@
 .. _libflame: https://github.com/flame/libflame
 .. _netlib BLAS: http://www.netlib.org/blas
 .. _netlib LAPACK: http://www.netlib.org/lapack/index.html
-.. _GotoBLAS2: https://www.tacc.utexas.edu/tacc-projects/gotoblas2
+.. _GotoBLAS2:
+   https://www.tacc.utexas.edu/research-development/tacc-software/gotoblas2
 .. _BLAS LAPACK review:
    http://www.wittwer.nl/wp-content/uploads/2009/08/blas_lapack.pdf
 .. _Eigen: http://eigen.tuxfamily.org/index.php?title=Main_Page
@@ -91,7 +92,7 @@
 
 .. Compilers, libraries
 .. _GNU compiler collection:
-   https://en.wikipedia.org/wiki/GNU_Compiler_Collection>`_
+   https://en.wikipedia.org/wiki/GNU_Compiler_Collection
 .. _MS runtime libraries:
    https://en.wikipedia.org/wiki/Microsoft_Windows_library_files#Runtime_libraries
 .. _table of MSVC versions and CRTs:
