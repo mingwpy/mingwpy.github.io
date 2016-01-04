@@ -120,8 +120,8 @@ http://sourceforge.net/p/msys2/wiki/MSYS2%20installation/
 Official mingw-w64 GCC toolchains
 *********************************
 
-'recommended' builds are available from the mingw-builds project at
-http://mingw-w64.sourceforge.net/download.php#mingw-builds for example:
+'recommended' builds are available from the mingw-builds project via
+http://mingw-w64.sourceforge.net/download.php |--| for example:
 
 - `64-bit target, SEH exceptions, posix threads
   <http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh>`_

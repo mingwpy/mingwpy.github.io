@@ -113,7 +113,7 @@ All code in a single process should use one single version of the MSVC runtime
 (see `MSDN article
 <https://msdn.microsoft.com/en-us/library/ms235460.aspx>`_).
 
-The Python that gets installed from downloading from https://python.org is
+The Python that gets installed from downloading from https://www.python.org is
 build with MSVC.  Therefore Python extensions for Python installed from these
 installers must use the same MSVC CRT.
 

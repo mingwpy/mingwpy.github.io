@@ -27,7 +27,7 @@ be badly optimized for a particular processor.  The main developer of ATLAS is
 Clint Whaley.  His main priority is optimizing for HPC machines, and he does
 not give much time to supporting Windows builds.  Not surprisingly, ATLAS is
 difficult to build on Windows, and is `not well optimized for Windows 64 bit
-<http://math-atlas.sourceforge.net/atlas_install/node57>`_.
+<http://math-atlas.sourceforge.net/atlas_install/node57.html>`_.
 
 Advantages:
 
@@ -234,7 +234,7 @@ Netlib reference implementation
 See `netlib BLAS`_ and `netlib LAPACK`_.
 
 Most available benchmarks (e.g `R benchmarks
-<http://cran.r-project.org/web/packages/gcbd/vignettes/gcbd.pdf>`_, `BLAS
+<https://cran.r-project.org/web/packages/gcbd/vignettes/gcbd.pdf>`_, `BLAS
 LAPACK review`_) show the reference BLAS / LAPACK to be considerably slower
 than any optimized library.
 

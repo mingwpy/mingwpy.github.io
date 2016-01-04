@@ -22,7 +22,7 @@ Glossary
         an IDE.
 
     gcc
-        `GNU compiler collection`_ When we mean the C or C++ compiler
+        The `GNU compiler collection`_. When we mean the C or C++ compiler
         specifically, we write "gcc c" or "gcc c++".
 
     MSCRT
