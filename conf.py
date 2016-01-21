@@ -50,7 +50,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'mingwpy'
-copyright = u'2015, Carl Kleffner and collaborators'
+copyright = u'2015-2016, Carl Kleffner and collaborators'
 author = u'Carl Kleffner and collaborators'
 
 # The version info for the project you're documenting, acts as replacement for
