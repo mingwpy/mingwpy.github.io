@@ -41,11 +41,10 @@ Contents
 
     README.rst
 
-******************
-Indices and tables
-******************
+*******
+Contact
+*******
 
-* :ref:`genindex`
-* :ref:`search`
+* https://groups.google.com/forum/#!forum/mingwpy
 
 .. include:: links_names.inc
