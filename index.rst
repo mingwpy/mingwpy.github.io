@@ -7,10 +7,8 @@
 The Mingwpy project
 ###################
 
-The mingwpy project provides a compiler for Python extension modules that is
-based on the :term:`mingw-w64` :term:`gcc` compilers, but where the compiled
-extensions are compatible with Python and other extensions compiled using
-:term:`Microsoft Visual C++`.
+Building :term:`mingw-w64` :term:`gcc` compiler for Python extension modules
+that creates binaries compatible with :term:`Microsoft Visual C++`.
 
 ********
 Contents
