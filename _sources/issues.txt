@@ -158,25 +158,24 @@ Firstly, the CRT is now two files:
 of which the first will be kept with a backwards-compatible API / ABI across
 new VS releases.
 
-Second, linking correctly to these new 2015 libraries requires careful choice
-of the DLL import library.
+Second, linking correctly to these new 2015 libraries requires some
+careful handling of the DLL import library (the ".lib" or ".a" file
+that's used for actually linking to a .dll on Windows). We *don't*
+want to use the standard mingw-w64 trick of dumping the symbols from
+``ucrtbase.dll`` and using them to generate a import library; that
+will do the wrong thing. To understand why and what the right thing
+is, read this:
 
-(Quoting Nathaniel Smith on email):
+.. toctree::
+    :maxdepth: 1
 
-    The good news though is that I think we actually do know how to do this --
-    basically it's just, instead of linking directly to ucrtbase.dll, there
-    are 15 "interface dlls" that export the various CRT symbols, so one has to
-    link to the needed ones directly. (This is based on my fiddling around
-    with the UCRT SDK, and Kai has apparently come to a similar conclusion.)
-    So it'd be good to ask MS to confirm, but I'm ~90% sure this is right.
+    ucrt
 
-    Symbols and DLLs:
-        https://gist.github.com/njsmith/08b1e52b65ea90427bfd
-
-99% of the things we care about are in the safe unversioned
-``ucrtbase.dll``. There remains some question of what to do with
-``vcruntime140.dll``. The ideal would be that our toolchain simply
-doesn't link to it at all. It looks like the symbols it provides are::
+So that's how to handle ``ucrtbase.dll``. 99% of the things we care
+about are in the safe unversioned ``ucrtbase.dll``. There remains some
+question of what to do with ``vcruntime140.dll``. The ideal would be
+that our toolchain simply doesn't link to it at all. It looks like the
+symbols it provides are::
 
   [Ordinal/Name Pointer] Table
         [   0] _CreateFrameInfo

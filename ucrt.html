@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>How to correctly link to UCRT (and why it works that way) &mdash; mingwpy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
+    <link rel="up" title="Issues" href="issues.html" />
+    <link rel="next" title="Mingwpy distribution" href="mingwpy.html" />
+    <link rel="prev" title="Issues" href="issues.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="how-to-correctly-link-to-ucrt-and-why-it-works-that-way">
+<h1>How to correctly link to UCRT (and why it works that way)<a class="headerlink" href="#how-to-correctly-link-to-ucrt-and-why-it-works-that-way" title="Permalink to this headline">¶</a></h1>
+<p>The license that Microsoft imposes on the Windows runtime SDK makes it
+impossible for the gcc/mingw-w64 developers to use the official CRT
+.lib files. They have to recreate everything from scratch, and in
+particular, they need to jerry-rig their own mechanism for linking to
+ucrtbase.dll.</p>
+<p>Traditionally, the way this has worked is that someone grabs the .dll,
+dumps out the list of symbols it contains, and then uses that list to
+make a new .lib file. And we almost went ahead and started
+distributing software linked to ucrtbase.dll like this... except for a
+stray mention in a <a class="reference external" href="http://stevedower.id.au/blog/building-for-python-3-5/">blog post by Steve Dower</a> suggesting
+that because the UCRT uses &#8220;API sets&#8221;, it&#8217;s actually forbidden to link
+to ucrtbase.dll directly and one <em>must</em> use the official .lib file, or
+else one loses all compatibility guarantees.</p>
+<p>I think we can all agree that it would suck if in a few years MS
+pushed an update to ucrtbase.dll, and suddenly all mingw-w64-compiled
+applications (like: git, R, NumPy, ...) started crashing on
+startup. So we want to get this right.</p>
+<p>The combination of MS legal terms that mean we can&#8217;t use the .lib
+file, plus MS technical requirements that mean we must use the .lib
+file, leaves us in a bit of a bind :-). The simplest way out of this
+is to figure out what the <em>actual</em> compatibility guarantees are, and
+make sure that our jerry-rigged mechanism only uses stable
+interfaces. Below is my attempt to figure this out &#8211; and, the good
+news is, we sent this text to the folks at MS who maintain the UCRT
+and they signed off on it :-).</p>
+<div class="section" id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
+<p>Maintaining a shared library ABI in the long term is very
+difficult. It helps a lot if there&#8217;s way to provide a new,
+incompatible version of a single ABI symbol without breaking old
+programs.</p>
+<p>For the UCRT to be supportable in the long term, we need to (a) have a
+single DLL containing the full CRT, and (b) make it possible for
+references to &#8216;malloc&#8217; in a program compiled at time 1 to refer to one
+symbol in this DLL, while references to &#8216;malloc&#8217; in a program compiled
+at time 2 refer to a <em>different</em> symbol inside this same DLL. So the
+traditional symbol lookup key of (DLL name, symbol name) isn&#8217;t going
+to work &#8211; we need (ucrtbase.dll, malloc, time 1) to resolve to a
+different symbol than (ucrtbase.dll, malloc, time 2).</p>
+<p>Useful comparison: glibc &#8211; which is Linux&#8217;s equivalent of the UCRT &#8211;
+faces the identical problem, and they solve it via ELF &#8220;symbol
+versioning&#8221;, where symbol lookup actually is extended to act on the
+3-tuple (DLL name, symbol name, symbol version), and at build time the
+linker takes references like (glibc, malloc) and tags them with
+version information. But the PE format doesn&#8217;t have symbol versions,
+so Windows needs a different solution.</p>
+<p>Fortunately, it turns out that we can cobble together a solution out
+of features that PE has supported for years.</p>
+</div>
+<div class="section" id="api-set-implementation">
+<h2>API set implementation<a class="headerlink" href="#api-set-implementation" title="Permalink to this headline">¶</a></h2>
+<p>The essential idea is that we are going to mangle the symbol version
+into the dll name (as contrasted with the ELF approach, which
+essentially mangles the symbol version into the symbol name). So
+instead of referring to e.g. (ucrtbase.dll, malloc), any binaries we
+compile now will contain references to something like
+(ucrtbase-v1.dll, malloc); and then in the future if the symbol
+changes incompatibly, then we can leave the old implementation
+available in ucrtbase-v1.dll and update our SDK so that new binaries
+will refer to something like (ucrtbase-v2.dll, malloc); that way both
+sets of binaries can keep working indefinitely.</p>
+<p>There are two problems we&#8217;ll have to overcome to make this work,
+though. First and most obviously, as written this makes it look like
+we&#8217;ve reverted back to the bad old days where there were multiple
+incompatible CRT dlls. To avoid that, we want to have multiple DLL
+<em>names</em>, but we want both versions of malloc to ultimately be
+implemented by a single unversioned, updated-in-place ucrtbase.dll. So
+under the hood, ucrtbase.dll will have malloc_v1 and malloc_v2, and
+then we need to maintain a table of replacements so whenever we load a
+binary that refers to (ucrtbase-v1.dll, malloc), then what that binary
+will actually get is (ucrtbase.dll, malloc_v1), and similarly
+(ucrtbase-v2, malloc) will get resolved to (ucrtbase.dll,
+malloc_v2). And this table of replacements of course needs to be
+distributed and updated along with ucrtbase.dll. Once all that&#8217;s in
+place, then we&#8217;ll be free to rearrange ucrtbase.dll any way we like in
+the future, so long as we also update the replacement table at the
+same time.</p>
+<p>Fortunately, it turns out that the PE format already has exactly this
+kind of replacement table mechanism: <a class="reference external" href="https://blogs.msdn.microsoft.com/oldnewthing/20060719-24/?p=30473">symbol forwarding</a>. Normally,
+a DLL&#8217;s export table has a bunch of entries like &#8220;if you&#8217;re looking
+for m my &#8216;malloc&#8217; symbol, then see offset 0x00abef80 within this
+file&#8221;. But there&#8217;s also another option: we can create a DLL called
+&#8216;ucrtbase-v1.dll&#8217;, whose exports table just has a bunch of entries
+saying &#8220;if you&#8217;re looking for &#8216;malloc&#8217;, then go load ucrtbase.dll
+instead and find its symbol called &#8216;malloc_v1&#8217;&#8221;. And then we can
+distribute and update this shim DLL alongside ucrtbase.dll.</p>
+<p>Second, we have to decide how to lay out our shim DLL or DLLs. In the
+above example, we for simplicity assumed that we would have just one
+shim DLL for the entire UCRT. In this approach, every time we modify
+any symbol, we&#8217;d have to create a whole new shim DLL and bump the
+version number for all the symbols together. This wouldn&#8217;t be
+disastrous, but might get expensive in the long run: in a large
+program we might eventually have to load ucrtbase-v1, ucrtbase-v2,
+ucrtbase-v3, ... each of which would contain ~1300 export entries that
+need to be read and processed, even though most of them are
+identical. At the other extreme, you have the ELF-style approach where
+every symbol gets its own independent version number. For ELF this
+works fine because the version numbers are simply stored in a table
+within the shared object; for us it would be rather expensive, because
+we&#8217;d have to create a whole new DLL for each and every symbol, which
+means that starting even simple programs would require us to locate
+and load ~1300 separate DLLs. In practice, the UCRT splits the
+difference: following the natural assumption that any change which
+breaks &#8216;malloc&#8217; is also likely to break &#8216;free&#8217; and &#8216;realloc&#8217;, it
+divides the ~1300 symbols into 14 groups by theme (&#8220;heap&#8221;, &#8220;stdio&#8221;,
+&#8220;time&#8221;, etc.), and each group gets its own explicitly-versioned shim
+DLL with a name like api-ms-win-crt-heap-l1-1-0.dll.  (This also fits
+with conventions established for the shim DLLs used for the core
+Windows APIs starting in Windows 7 &#8211; though those are implemented via
+a different mechanism internally &#8211; and I suppose it might eventually
+make it easier to define slimmed-down versions of the CRT that only
+provide a subset of these symbols.)</p>
+<p>And finally, we need a convenient way for users to link to these
+things, because no-one wants to have to explicitly list all of the
+api-ms-win-crt-* libraries in a giant linker command line. This turns
+out to be easy as well. Conventionally, every shared library foo.dll
+has a corresponding foo.lib, and when you want to link your code then
+foo.lib is what you actually give to the linker. And conventionally,
+foo.lib just contains a bunch of entries that tell the linker: &#8220;if you
+want symbol XX, then you should find it foo.dll&#8221;. However, there isn&#8217;t
+actually any rule that all the entries in foo.lib have to refer to
+foo.dll &#8211; this is just a convention. ucrt.lib breaks this convention
+&#8211; it has an entry for &#8216;malloc&#8217; that says it can be found in
+api-ms-win-crt-heap-l1-1-0.dll, an entry for &#8216;rename&#8217; that says it can
+be found in api-ms-win-crt-filesystem-l1-1-0.dll, and so
+forth. (Basically ucrt.lib is what you&#8217;d get if you generated a
+conventional .lib file for each of the shim .dlls, and then
+concatenated them together.) The end result is that the user links to
+ucrt.lib, and then everything magically gets sorted out. Which is why
+none of this is documented and why I had to go work it out from first
+principles :-).</p>
+</div>
+<div class="section" id="conclusions">
+<h2>Conclusions<a class="headerlink" href="#conclusions" title="Permalink to this headline">¶</a></h2>
+<p>After all that, the conclusion is pretty simple:</p>
+<ul class="simple">
+<li>Correctly linking to the UCRT via &#8220;API sets&#8221; does not require any
+new features in the toolchain; it&#8217;s just some clever usage of old,
+well-supported features.</li>
+<li>The only &#8220;secret sauce&#8221; contained in the ucrt.lib file is the list
+of (DLL name, symbol name) pairs; given these, we can
+straightforwardly construct a new .lib file from scratch, and then
+any binaries that we link using our new .lib file will be linked to
+the UCRT in a safe, forwards-compatible manner.</li>
+</ul>
+<p>The list of (DLL name, symbol name) pairs for SDK version
+10.0.10240.0, x86-32 + x86-64, is available here:
+<a class="reference external" href="https://gist.github.com/njsmith/08b1e52b65ea90427bfd">https://gist.github.com/njsmith/08b1e52b65ea90427bfd</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">How to correctly link to UCRT (and why it works that way)</a><ul>
+<li><a class="reference internal" href="#background">Background</a></li>
+<li><a class="reference internal" href="#api-set-implementation">API set implementation</a></li>
+<li><a class="reference internal" href="#conclusions">Conclusions</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015-2016, Carl Kleffner and collaborators.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/ucrt.rst"
+          rel="nofollow">Edit on GitHub</a>
+    </div>
+
+    
+    <a href="https://github.com/mingwpy/mingwpy.github.io" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
