@@ -1,0 +1,11 @@
+# build documentation in `source` branch and commit result to `master`, from
+# https://github.com/matplotlib/matplotlib/blob/c259a556/.travis.yml#L147-L169
+
+sudo: false
+
+language: python
+
+script:
+  - make html
+  - linkchecker build/html/index.html
+
