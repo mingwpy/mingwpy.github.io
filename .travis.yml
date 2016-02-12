@@ -5,10 +5,7 @@ sudo: false
 
 language: python
 
-install:
-  - pip install linkchecker
-
 script:
   - make html
-  - linkchecker build/html/index.html
+  - linkchecker _build/html/index.html
 
