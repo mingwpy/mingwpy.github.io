@@ -7,8 +7,9 @@
 The Mingwpy project
 ###################
 
-Building :term:`mingw-w64` :term:`gcc` compiler for Python extension modules
-that creates binaries compatible with :term:`Microsoft Visual C++`.
+C/C++/Fortran compiler toolchain based on :term:`mingw-w64` :term:`gcc`
+that creates binaries compatible with :term:`Microsoft Visual C++` so
+that it can be used building Python extension modules.
 
 ********
 Contents
