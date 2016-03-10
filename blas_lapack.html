@@ -29,7 +29,7 @@
     <link rel="prev" title="MinGW-w64" href="background-mingw.html" />
    
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
   <body role="document">  
@@ -106,9 +106,9 @@ CPU does not have SSE2:</p>
     <span class="n">has_feature</span> <span class="o">=</span> <span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span><span class="o">.</span><span class="n">IsProcessorFeaturePresent</span>
     <span class="n">has_feature</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">has_feature</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;This version of numpy needs a CPU capable of SSE2, &quot;</span>
-                <span class="s">&quot;but Windows says - not so.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
-                <span class="s">&quot;Please reinstall numpy using a superpack installer&quot;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;This version of numpy needs a CPU capable of SSE2, &quot;</span>
+                <span class="s2">&quot;but Windows says - not so.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Please reinstall numpy using a superpack installer&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -316,8 +316,8 @@ be adressed with a single threaded version of that library.</p>
       &copy;2015-2016, Carl Kleffner and collaborators.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
       
       |
       <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/blas_lapack.rst"

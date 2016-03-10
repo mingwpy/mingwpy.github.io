@@ -14,3 +14,9 @@ and the PSF in early Jan 2016):
    :maxdepth: 1
 
    proposal_december2015
+
+Current status:
+
+- phase 1 of the proposal has been completed (March 2016)
+- work on phase 2 is in progress, see the
+  `Milestone on Github <https://github.com/mingwpy/mingwpy/milestones/Phase%202>`_
