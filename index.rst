@@ -31,6 +31,10 @@ Contents
 
     issues
     mingwpy
+
+.. toctree::
+    :maxdepth: 2
+
     roadmap
     glossary
 
