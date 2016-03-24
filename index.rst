@@ -7,9 +7,9 @@
 The Mingwpy project
 ###################
 
-The goal of the project is to provide a free open source toolchain for building Python extensions for Windows, and make sure that those extensions are compatible with CPython compiled with native Visual Studio.
+Provide a free open source toolchain for building Python extensions for Windows, and make sure that those extensions are compatible with CPython compiled with native Visual Studio.
 
-*mingwpy* toolchain contains customized gcc, g++ and gfortran compilers of the [GNU toolchain](https://en.wikipedia.org/wiki/GNU_toolchain) based on the [Mingw-w64](http://mingw-w64.org) and the [mingw-builds](https://github.com/niXman/mingw-builds) projects.
+*mingwpy* toolchain contains customized gcc, g++ and gfortran compilers of the `GNU toolchain <https://en.wikipedia.org/wiki/GNU_toolchain>`_ based on the `Mingw-w64 <http://mingw-w64.org>`_ and the `mingw-builds <https://github.com/niXman/mingw-builds>`_ projects.
 
 ********
 Contents
