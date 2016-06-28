@@ -17,7 +17,8 @@ Python 3.5  Visual C++ 2015 (14.0)
 ==========  ======================
 
 So to build extension for 2.7, 3.4 and 3.5 you need to install 3
-different compilers.
+different compilers. For other Python versions see the full list at
+http://matthew-brett.github.io/pydagogue/python_msvc.html
 
 ********************************************
 MSVS can be painful to install and configure
