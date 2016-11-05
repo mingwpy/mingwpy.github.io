@@ -29,15 +29,15 @@
     <link rel="prev" title="MinGW-w64" href="background-mingw.html" />
    
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">  
+  <body>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="blas-lapack-on-windows">
 <h1>BLAS / LAPACK on Windows<a class="headerlink" href="#blas-lapack-on-windows" title="Permalink to this headline">¶</a></h1>
@@ -85,7 +85,7 @@ format, where we build three ATLAS libraries:</p>
 <li>with support for SSE2 instructions;</li>
 <li>with support for SSE3 instructions;</li>
 </ul>
-<p>We make three Windows <code class="docutils literal"><span class="pre">.exe</span></code> installers, one for each of these ATLAS
+<p>We make three Windows <tt class="docutils literal"><span class="pre">.exe</span></tt> installers, one for each of these ATLAS
 versions, and then build a &#8220;superpack&#8221; installer from these three installers,
 that first checks the machine on which the superpack installer is running, to
 find what instructions the CPU supports, and then installs the matching numpy
@@ -96,7 +96,7 @@ and does not allow pre-install or post-install scripts.</p>
 <p>One option would be to build a binary wheel with ATLAS that depends on SSE2
 instructions.  It seems that 99.5% of Windows machines have SSE2 (see:
 <a class="reference external" href="https://github.com/numpy/numpy/wiki/Windows-versions">Windows versions</a>).  It is not technically difficult to put a check in the
-numpy <code class="docutils literal"><span class="pre">__init__.py</span></code> file to give a helpful error message and die when the
+numpy <tt class="docutils literal"><span class="pre">__init__.py</span></tt> file to give a helpful error message and die when the
 CPU does not have SSE2:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">windll</span><span class="p">,</span> <span class="n">wintypes</span>
@@ -181,8 +181,8 @@ works based upon the Software in whole or in part [...]</p>
 <div class="section" id="amd-compute-libraries">
 <h2>AMD compute libraries<a class="headerlink" href="#amd-compute-libraries" title="Permalink to this headline">¶</a></h2>
 <p>AMD advertise the <a class="reference external" href="http://developer.amd.com/tools-and-sdks/opencl-zone/acl-amd-compute-libraries/">AMD compute libraries</a> (ACL) as the successor to the ACML.</p>
-<p>The ACL page points us to <a class="reference internal" href="#blis-section"><span>BLAS-like instantiation software framework</span></a> for BLAS and
-<a class="reference internal" href="#libflame-section"><span>libflame</span></a> for LAPACK.</p>
+<p>The ACL page points us to <a class="reference internal" href="#blis-section"><em>BLAS-like instantiation software framework</em></a> for BLAS and
+<a class="reference internal" href="#libflame-section"><em>libflame</em></a> for LAPACK.</p>
 </div>
 <div class="section" id="blas-like-instantiation-software-framework">
 <span id="blis-section"></span><h2>BLAS-like instantiation software framework<a class="headerlink" href="#blas-like-instantiation-software-framework" title="Permalink to this headline">¶</a></h2>
@@ -275,7 +275,7 @@ be adressed with a single threaded version of that library.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -295,7 +295,7 @@ be adressed with a single threaded version of that library.</p>
 </li>
 </ul>
 
-<div id="searchbox" style="display: none" role="search">
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -316,8 +316,8 @@ be adressed with a single threaded version of that library.</p>
       &copy;2015-2016, Carl Kleffner and collaborators.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.2.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
       
       |
       <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/blas_lapack.rst"

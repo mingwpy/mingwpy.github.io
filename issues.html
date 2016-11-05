@@ -28,15 +28,15 @@
     <link rel="prev" title="BLAS / LAPACK on Windows" href="blas_lapack.html" />
    
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">  
+  <body>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="issues">
 <h1>Issues<a class="headerlink" href="#issues" title="Permalink to this headline">¶</a></h1>
@@ -47,11 +47,11 @@ find the correct version of runtime DLLs – see: <a class="reference external" 
 <p>One method to avoid this problem is to include any necessary runtime code in
 the compiled extension.  This can be done by:</p>
 <ul class="simple">
-<li>Compiling all extensions (DLLs) with <code class="docutils literal"><span class="pre">-static-libgcc</span></code>,
-<code class="docutils literal"><span class="pre">-static-libstdc++</span></code> etc flags;</li>
+<li>Compiling all extensions (DLLs) with <tt class="docutils literal"><span class="pre">-static-libgcc</span></tt>,
+<tt class="docutils literal"><span class="pre">-static-libstdc++</span></tt> etc flags;</li>
 <li>Using a gcc compiler toolchain that does static linking to runtimes by
 default.  This is a &#8220;static toolchain&#8221;.  The <a class="reference external" href="https://github.com/niXman/mingw-builds">mingw-builds</a> set of scripts
-builds such a toolchain by passing the <code class="docutils literal"><span class="pre">--static-gcc</span></code> argument (see:
+builds such a toolchain by passing the <tt class="docutils literal"><span class="pre">--static-gcc</span></tt> argument (see:
 <a class="reference external" href="https://github.com/niXman/mingw-builds/blob/17ae841dcf6e72badad7941a06d631edaf687436/build#L218">mingw-build build file</a>;</li>
 </ul>
 <p>Using these approaches, all the necessary object code from the GCC runtimes
@@ -75,7 +75,7 @@ projects like Sage that make heavy use of Cython, and each Cython
 source file creates a separate extension...). Or at least, it&#8217;s really
 bad IF it&#8217;s a problem at all. In fact I have no idea whether libgcc
 allocates any TLS keys at startup &#8211; introspecting a handy copy of
-libgcc*.dll shows that it does contain references to <code class="docutils literal"><span class="pre">TlsAlloc</span></code>, but
+libgcc*.dll shows that it does contain references to <tt class="docutils literal"><span class="pre">TlsAlloc</span></tt>, but
 I don&#8217;t know whether they&#8217;re called under ordinary circumstances. So
 we should start with static linking, but have a fallback plan in case
 it doesn&#8217;t work.</p>
@@ -93,7 +93,7 @@ BLAS dlls, that projects could declare a dependency on.</p>
 (2^2) byte stack alignment.</p>
 <p>Win64 X86_64 is not affected.  This issue is the major cause for segment
 faults on 32bit systems.</p>
-<p>The solution is to use the <code class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></code> flag for compiling.</p>
+<p>The solution is to use the <tt class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></tt> flag for compiling.</p>
 <p>From:
 <a class="reference external" href="https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs">https://docs.google.com/document/d/1lnWj0UhxJkeK0WyQdoW2opQKJfIseaN0qimFZbFOOYs</a></p>
 <blockquote>
@@ -123,7 +123,7 @@ function:</p>
 </pre></div>
 </div>
 <p>and if this prints any output then we have our proof that
-<code class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></code> is necessary for Windows/MSVC
+<tt class="docutils literal"><span class="pre">-mincoming-stack-boundary=2</span></tt> is necessary for Windows/MSVC
 compatibility.</p>
 </div>
 <div class="section" id="choice-of-msvc-runtime">
@@ -184,8 +184,8 @@ mingw-w64 headers (tuned to MSVCRT.DLL) and those in the newer C runtime.</p>
 14 (MSVS 2015).</p>
 <p>Firstly, the CRT is now two files:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">ucrtbase.dll</span></code>;</li>
-<li><code class="docutils literal"><span class="pre">vcruntime140.dll</span></code>;</li>
+<li><tt class="docutils literal"><span class="pre">ucrtbase.dll</span></tt>;</li>
+<li><tt class="docutils literal"><span class="pre">vcruntime140.dll</span></tt>;</li>
 </ul>
 <p>of which the first will be kept with a backwards-compatible API / ABI across
 new VS releases.</p>
@@ -193,7 +193,7 @@ new VS releases.</p>
 careful handling of the DLL import library (the &#8221;.lib&#8221; or &#8221;.a&#8221; file
 that&#8217;s used for actually linking to a .dll on Windows). We <em>don&#8217;t</em>
 want to use the standard mingw-w64 trick of dumping the symbols from
-<code class="docutils literal"><span class="pre">ucrtbase.dll</span></code> and using them to generate a import library; that
+<tt class="docutils literal"><span class="pre">ucrtbase.dll</span></tt> and using them to generate a import library; that
 will do the wrong thing. To understand why and what the right thing
 is, read this:</p>
 <div class="toctree-wrapper compound">
@@ -201,9 +201,9 @@ is, read this:</p>
 <li class="toctree-l1"><a class="reference internal" href="ucrt.html">How to correctly link to UCRT (and why it works that way)</a></li>
 </ul>
 </div>
-<p>So that&#8217;s how to handle <code class="docutils literal"><span class="pre">ucrtbase.dll</span></code>. 99% of the things we care
-about are in the safe unversioned <code class="docutils literal"><span class="pre">ucrtbase.dll</span></code>. There remains some
-question of what to do with <code class="docutils literal"><span class="pre">vcruntime140.dll</span></code>. The ideal would be
+<p>So that&#8217;s how to handle <tt class="docutils literal"><span class="pre">ucrtbase.dll</span></tt>. 99% of the things we care
+about are in the safe unversioned <tt class="docutils literal"><span class="pre">ucrtbase.dll</span></tt>. There remains some
+question of what to do with <tt class="docutils literal"><span class="pre">vcruntime140.dll</span></tt>. The ideal would be
 that our toolchain simply doesn&#8217;t link to it at all. It looks like the
 symbols it provides are:</p>
 <div class="highlight-python"><div class="highlight"><pre>[Ordinal/Name Pointer] Table
@@ -286,24 +286,24 @@ pretty sure this stuff is all irrelevant to us, because libgcc should
 already be providing the equivalent machinery needed for any C++ code
 that&#8217;s compiled using gcc, and trying to achieve C++ ABI compatibility
 between MSVC and gcc is outside the scope of this project.</p>
-<p>Of the rest, <code class="docutils literal"><span class="pre">set_unexpected</span></code> and <code class="docutils literal"><span class="pre">unexpected</span></code> can be ignored,
+<p>Of the rest, <tt class="docutils literal"><span class="pre">set_unexpected</span></tt> and <tt class="docutils literal"><span class="pre">unexpected</span></tt> can be ignored,
 because they&#8217;re yet more C++-related nonsense that <a class="reference external" href="https://msdn.microsoft.com/en-us/library/h46t5b69.aspx">apparently isn&#8217;t
 even used anymore</a>), but the
 others are real standard C functions, and a quick check reveals that
-most of them are <em>not</em> available in <code class="docutils literal"><span class="pre">ucrtbase.dll</span></code>, but only here in
-<code class="docutils literal"><span class="pre">vcruntime140.dll</span></code>.</p>
+most of them are <em>not</em> available in <tt class="docutils literal"><span class="pre">ucrtbase.dll</span></tt>, but only here in
+<tt class="docutils literal"><span class="pre">vcruntime140.dll</span></tt>.</p>
 <p>These can be broken down further into two categories:</p>
 <ol class="arabic">
-<li><p class="first">Simple string functions: <code class="docutils literal"><span class="pre">memchr</span></code>, <code class="docutils literal"><span class="pre">memcmp</span></code>, <code class="docutils literal"><span class="pre">memcpy</span></code>,
-<code class="docutils literal"><span class="pre">memmove</span></code>, <code class="docutils literal"><span class="pre">memset</span></code>, <code class="docutils literal"><span class="pre">strchr</span></code>, <code class="docutils literal"><span class="pre">strrchr</span></code>, <code class="docutils literal"><span class="pre">strstr</span></code>,
-<code class="docutils literal"><span class="pre">wcschr</span></code>, <code class="docutils literal"><span class="pre">wcsrchr</span></code>, <code class="docutils literal"><span class="pre">wcsstr</span></code>. These are crucial functions
+<li><p class="first">Simple string functions: <tt class="docutils literal"><span class="pre">memchr</span></tt>, <tt class="docutils literal"><span class="pre">memcmp</span></tt>, <tt class="docutils literal"><span class="pre">memcpy</span></tt>,
+<tt class="docutils literal"><span class="pre">memmove</span></tt>, <tt class="docutils literal"><span class="pre">memset</span></tt>, <tt class="docutils literal"><span class="pre">strchr</span></tt>, <tt class="docutils literal"><span class="pre">strrchr</span></tt>, <tt class="docutils literal"><span class="pre">strstr</span></tt>,
+<tt class="docutils literal"><span class="pre">wcschr</span></tt>, <tt class="docutils literal"><span class="pre">wcsrchr</span></tt>, <tt class="docutils literal"><span class="pre">wcsstr</span></tt>. These are crucial functions
 that we definitely need to support, but there&#8217;s no particular
 advantage to using the implementation from
-<code class="docutils literal"><span class="pre">vcruntime140.dll</span></code>. They can just be reimplemented inside
+<tt class="docutils literal"><span class="pre">vcruntime140.dll</span></tt>. They can just be reimplemented inside
 mingw-w64. (Basic working versions are trivial; making them fast
 takes more work, but could be lifted from BSD libc or whatever.)</p>
 </li>
-<li><p class="first"><code class="docutils literal"><span class="pre">setjmp</span></code> / <code class="docutils literal"><span class="pre">longjmp</span></code>: Reimplementing these from scratch would
+<li><p class="first"><tt class="docutils literal"><span class="pre">setjmp</span></tt> / <tt class="docutils literal"><span class="pre">longjmp</span></tt>: Reimplementing these from scratch would
 be a huuuuge hassle. Fortunately, they&#8217;re a very advanced and
 tricky feature that&#8217;s rarely useful! ...But unfortunately, both
 numpy and scipy actually use them. Numpy&#8217;s usage might be optional
@@ -314,12 +314,12 @@ in the first place), but scipy uses them for actual flow control
 D-:. It&#8217;s possible this could just be fixed in scipy if necessary.</p>
 <p>setjmp/longjmp may also be needed for exception handling to work in
 32-bit mingw-w64-compiled C++ code. Though I&#8217;m actually a bit
-confused on this point, since the copy of <code class="docutils literal"><span class="pre">libgcc_s_sjlj-1.dll</span></code>
+confused on this point, since the copy of <tt class="docutils literal"><span class="pre">libgcc_s_sjlj-1.dll</span></tt>
 that I have on my Debian box doesn&#8217;t actually seem to contain any
-references to the <code class="docutils literal"><span class="pre">setjmp</span></code> or <code class="docutils literal"><span class="pre">longjmp</span></code> symbols in the CRT?</p>
+references to the <tt class="docutils literal"><span class="pre">setjmp</span></tt> or <tt class="docutils literal"><span class="pre">longjmp</span></tt> symbols in the CRT?</p>
 <p>On further investigation it looks like <em>maybe</em> the reason libgcc
 does not import setjmp/longjmp from the CRT is that it is built to
-use the gcc builtins <code class="docutils literal"><span class="pre">__builtin_setjmp</span></code> / <code class="docutils literal"><span class="pre">__builtin_longjmp</span></code>
+use the gcc builtins <tt class="docutils literal"><span class="pre">__builtin_setjmp</span></tt> / <tt class="docutils literal"><span class="pre">__builtin_longjmp</span></tt>
 instead? If these exist and are functional in mingw-w64 builds then
 that is an even better solution &#8211; we just need to set up the
 headers so that user code that tries to call setjmp/longjmp are
@@ -347,7 +347,7 @@ away all the low-order bits anyway... but if you&#8217;re going to keep those
 bits then it becomes more of an issue.</p>
 <p>[...]</p>
 </div></blockquote>
-<p>Investigating <code class="docutils literal"><span class="pre">sleef</span></code> library for needed functions.  Nathaniel suggested
+<p>Investigating <tt class="docutils literal"><span class="pre">sleef</span></tt> library for needed functions.  Nathaniel suggested
 libm implementation from bionic (Android&#8217;s libc).</p>
 <p>Bionic&#8217;s libm is here: <a class="reference external" href="https://github.com/android/platform_bionic/tree/master/libm/x86">https://github.com/android/platform_bionic/tree/master/libm/x86</a>
 Basically what would be needed is just copying these files into mingw-w64 plus
@@ -356,8 +356,8 @@ build system updates.</p>
 <div class="section" id="distutils-issues">
 <h2>Distutils issues<a class="headerlink" href="#distutils-issues" title="Permalink to this headline">¶</a></h2>
 <p>Mingw via Python distutils needs to link extension code to the correct Python
-library, e.g. <code class="docutils literal"><span class="pre">libpython27.dll</span></code>.  To do this, mingw needs a library
-definition file <code class="docutils literal"><span class="pre">libpython27.a</span></code>.  It is possible to create this file using
+library, e.g. <tt class="docutils literal"><span class="pre">libpython27.dll</span></tt>.  To do this, mingw needs a library
+definition file <tt class="docutils literal"><span class="pre">libpython27.a</span></tt>.  It is possible to create this file using
 the mingw-w64 tools.</p>
 <p><em>Query from njs: can&#8217;t we just use the python27.lib that&#8217;s shipped
 with CPython itself?</em></p>
@@ -406,7 +406,7 @@ different processors or gcc compile farm.</li>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -424,7 +424,7 @@ different processors or gcc compile farm.</li>
 </li>
 </ul>
 
-<div id="searchbox" style="display: none" role="search">
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -445,8 +445,8 @@ different processors or gcc compile farm.</li>
       &copy;2015-2016, Carl Kleffner and collaborators.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.2.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
       
       |
       <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/issues.rst"

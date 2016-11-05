@@ -28,15 +28,15 @@
     <link rel="prev" title="How to correctly link to UCRT (and why it works that way)" href="ucrt.html" />
    
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">  
+  <body>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="mingwpy-distribution">
 <h1>Mingwpy distribution<a class="headerlink" href="#mingwpy-distribution" title="Permalink to this headline">¶</a></h1>
@@ -62,7 +62,7 @@ extensions.</p>
 <li>two dedicated GCC toolchains for both 32bit (POSIX threads, Dwarf
 exceptions) and 64 bit (POSIX threads, SEH exceptions);</li>
 <li>statically built toolchain based on gcc and mingw-w64;</li>
-<li>languages: C, C++, gfortran, with <a class="reference internal" href="glossary.html#term-lto"><span class="xref std std-term">LTO</span></a> enabled;</li>
+<li>languages: C, C++, gfortran, with <a class="reference internal" href="glossary.html#term-lto"><em class="xref std std-term">LTO</em></a> enabled;</li>
 <li>customized &#8216;specs&#8217; file for MSVCR90 linkage and manifest support (MSVCR100
 linkage coming soon);</li>
 <li>additional ftime64 patch to allow winpthreads and OpenMP to work with
@@ -74,11 +74,11 @@ MSVCR90 linkage;</li>
 <span id="notes"></span><h2>Notes for the distribution<a class="headerlink" href="#notes-for-the-distribution" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="libpython-import-files">
 <h3>libpython import files<a class="headerlink" href="#libpython-import-files" title="Permalink to this headline">¶</a></h3>
-<p>The <code class="docutils literal"><span class="pre">libpython27.a</span></code> import files have been generated with <code class="docutils literal"><span class="pre">gendef</span></code> and
-<code class="docutils literal"><span class="pre">dlltool</span></code> according to the recommendations on the mingw-w64 faq site. It is
+<p>The <tt class="docutils literal"><span class="pre">libpython27.a</span></tt> import files have been generated with <tt class="docutils literal"><span class="pre">gendef</span></tt> and
+<tt class="docutils literal"><span class="pre">dlltool</span></tt> according to the recommendations on the mingw-w64 faq site. It is
 essential to not use import libraries from anywhere, but create them with the
 tools in the GCC toolchain. The GCC toolchains contain correct generated
-<code class="docutils literal"><span class="pre">mscvrXXX</span></code> import files by default.</p>
+<tt class="docutils literal"><span class="pre">mscvrXXX</span></tt> import files by default.</p>
 </div>
 <div class="section" id="openblas-files">
 <h3>OpenBLAS files<a class="headerlink" href="#openblas-files" title="Permalink to this headline">¶</a></h3>
@@ -183,7 +183,7 @@ python setup.py build --help-fcompiler
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -206,7 +206,7 @@ python setup.py build --help-fcompiler
 </li>
 </ul>
 
-<div id="searchbox" style="display: none" role="search">
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -227,8 +227,8 @@ python setup.py build --help-fcompiler
       &copy;2015-2016, Carl Kleffner and collaborators.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.2.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
       
       |
       <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/mingwpy.rst"
