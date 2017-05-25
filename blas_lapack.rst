@@ -97,28 +97,18 @@ the range, `except on AMD processors
 It is closed-source, but available for free under the `Community licensing
 program <https://software.intel.com/sites/campaigns/nest>`_.
 
-The `Intel license
-<https://software.intel.com/en-us/articles/end-user-license-agreement>`_ does
-allow us, the developers, to distribute copies of the MKL with our built
-binaries, but carries the following extra license terms:
+The MKL is covered by the `Intel Simplified Software License <https://software.intel.com/en-us/license/intel-simplified-software-license>`_ (see the `Intel license page
+<https://software.intel.com/en-us/articles/end-user-license-agreement>`_). The
+Simplified Software License does allow us, the developers, to distribute
+copies of the MKL with our built binaries, where we include their terms of use
+in our distribution.  These include:
 
-    H. DISTRIBUTION: Distribution of the Redistributables is also subject to
-       the following limitations:
-       [clauses i through iii omitted]
+     YOU AGREE TO INDEMNIFIY AND HOLD INTEL HARMLESS AGAINST ANY CLAIMS AND
+     EXPENSES RESULTING FROM YOUR USE OR UNAUTHORIZED USE OF THE SOFTWARE.
 
-       [You] (iv) will provide the Redistributables subject to a license
-       agreement that prohibits disassembly and reverse engineering of the
-       Redistributables except in cases when you provide Your Product subject
-       to an open source license that is not an Excluded License, for example,
-       the BSD license, or the MIT license, (v) will indemnify, hold harmless,
-       and defend Intel and its suppliers from and against any claims or
-       lawsuits, including attorney's fees, that arise or result from Your
-       modifications, derivative works or Your distribution of Your Product.
-
-Clause iv does allow us numpyers (as we use the BSD license) to distribute
-wheels without asking the users to submit to extra licensing terms.
-Unfortunately clause v makes us, the developers, responsible for legal costs
-that could be very large.
+This clause appears to apply to the users of our binaries, not us, the authors
+of the binary.  This is a change from Intel's previous MKL license, which
+required us, the authors, to pay Intel's legal fees of the user sued Intel.
 
 See discussions about `MKL on numpy mailing list
 <http://numpy-discussion.10968.n7.nabble.com/Windows-wheels-using-MKL-td37097.html>`_
@@ -132,8 +122,7 @@ Advantages:
 
 Disadvantages:
 
-* Closed source;
-* License terms probably not acceptable to numpy developers.
+* Closed source.
 
 *********************
 AMD Core Math Library
@@ -150,8 +139,8 @@ The ACML does not appear to contain a CBLAS_ interface.
 
 Binaries linked against ACML have to conform to the `ACML license
 <http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/ACML_June_24_2010_v2.pdf>`_
-which, as for the MKL, requires software linked to the ACML to subject users
-to the ACML license terms including:
+which, as for the older MKL license, requires software linked to the ACML to
+subject users to the ACML license terms including:
 
   2. Restrictions. The Software contains copyrighted and patented
   material, trade secrets and other proprietary material. In order to
