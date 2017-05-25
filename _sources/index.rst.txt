@@ -7,10 +7,9 @@
 The Mingwpy project
 ###################
 
-The mingwpy project provides a compiler for Python extension modules that is
-based on the :term:`mingw-w64` :term:`gcc` compilers, but where the compiled
-extensions are compatible with Python and other extensions compiled using
-:term:`Microsoft Visual C++`.
+Provide a free open source toolchain for building Python extensions for Windows, and make sure that those extensions are compatible with CPython compiled with native Visual Studio.
+
+*mingwpy* toolchain contains customized gcc, g++ and gfortran compilers of the `GNU toolchain <https://en.wikipedia.org/wiki/GNU_toolchain>`_ based on the `Mingw-w64 <http://mingw-w64.org>`_ and the `mingw-builds <https://github.com/niXman/mingw-builds>`_ projects.
 
 ********
 Contents
@@ -31,6 +30,10 @@ Contents
 
     issues
     mingwpy
+
+.. toctree::
+    :maxdepth: 2
+
     roadmap
     glossary
 

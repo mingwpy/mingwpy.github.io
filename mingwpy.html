@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Mingwpy distribution &mdash; mingwpy 0.1 documentation</title>
+    <title>Mingwpy distribution &#8212; mingwpy 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,26 +17,31 @@
         VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Roadmap" href="roadmap.html" />
     <link rel="prev" title="How to correctly link to UCRT (and why it works that way)" href="ucrt.html" />
    
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body>  
+  <body role="document">
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="mingwpy-distribution">
 <h1>Mingwpy distribution<a class="headerlink" href="#mingwpy-distribution" title="Permalink to this headline">¶</a></h1>
@@ -44,7 +49,7 @@
 <h2>What is it?<a class="headerlink" href="#what-is-it" title="Permalink to this headline">¶</a></h2>
 <p>mingwpy is a mingw-w64 gcc toolchain customized for building Python
 extensions.</p>
-<p>See <a class="reference internal" href="issues.html"><em>Issues</em></a> for the need of the various customizations.</p>
+<p>See <a class="reference internal" href="issues.html"><span class="doc">Issues</span></a> for the need of the various customizations.</p>
 </div>
 <div class="section" id="where-is-it">
 <h2>Where is it?<a class="headerlink" href="#where-is-it" title="Permalink to this headline">¶</a></h2>
@@ -54,7 +59,7 @@ extensions.</p>
 <div class="section" id="what-s-in-it">
 <h2>What&#8217;s in it?<a class="headerlink" href="#what-s-in-it" title="Permalink to this headline">¶</a></h2>
 <p>See <a class="reference internal" href="#notes">notes</a> below.</p>
-<p>See <a class="reference internal" href="mingwpy_older.html"><em>Mingwpy retired bitbucket site</em></a> for lists of files in the (older) distribution.</p>
+<p>See <a class="reference internal" href="mingwpy_older.html"><span class="doc">Mingwpy retired bitbucket site</span></a> for lists of files in the (older) distribution.</p>
 </div>
 <div class="section" id="customizations-over-standard-mingw-builds-releases">
 <h2>Customizations over standard mingw-builds releases<a class="headerlink" href="#customizations-over-standard-mingw-builds-releases" title="Permalink to this headline">¶</a></h2>
@@ -62,7 +67,7 @@ extensions.</p>
 <li>two dedicated GCC toolchains for both 32bit (POSIX threads, Dwarf
 exceptions) and 64 bit (POSIX threads, SEH exceptions);</li>
 <li>statically built toolchain based on gcc and mingw-w64;</li>
-<li>languages: C, C++, gfortran, with <a class="reference internal" href="glossary.html#term-lto"><em class="xref std std-term">LTO</em></a> enabled;</li>
+<li>languages: C, C++, gfortran, with <a class="reference internal" href="glossary.html#term-lto"><span class="xref std std-term">LTO</span></a> enabled;</li>
 <li>customized &#8216;specs&#8217; file for MSVCR90 linkage and manifest support (MSVCR100
 linkage coming soon);</li>
 <li>additional ftime64 patch to allow winpthreads and OpenMP to work with
@@ -74,11 +79,11 @@ MSVCR90 linkage;</li>
 <span id="notes"></span><h2>Notes for the distribution<a class="headerlink" href="#notes-for-the-distribution" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="libpython-import-files">
 <h3>libpython import files<a class="headerlink" href="#libpython-import-files" title="Permalink to this headline">¶</a></h3>
-<p>The <tt class="docutils literal"><span class="pre">libpython27.a</span></tt> import files have been generated with <tt class="docutils literal"><span class="pre">gendef</span></tt> and
-<tt class="docutils literal"><span class="pre">dlltool</span></tt> according to the recommendations on the mingw-w64 faq site. It is
+<p>The <code class="docutils literal"><span class="pre">libpython27.a</span></code> import files have been generated with <code class="docutils literal"><span class="pre">gendef</span></code> and
+<code class="docutils literal"><span class="pre">dlltool</span></code> according to the recommendations on the mingw-w64 faq site. It is
 essential to not use import libraries from anywhere, but create them with the
 tools in the GCC toolchain. The GCC toolchains contain correct generated
-<tt class="docutils literal"><span class="pre">mscvrXXX</span></tt> import files by default.</p>
+<code class="docutils literal"><span class="pre">mscvrXXX</span></code> import files by default.</p>
 </div>
 <div class="section" id="openblas-files">
 <h3>OpenBLAS files<a class="headerlink" href="#openblas-files" title="Permalink to this headline">¶</a></h3>
@@ -115,34 +120,34 @@ into the GCC toolchain.</p>
 <li><p class="first">create a mingw distutils.cfg file</p>
 </li>
 <li><p class="first">test the configuration:</p>
-<div class="highlight-python"><div class="highlight"><pre>python setup.py config_fc --verbose
-python setup.py build --help-fcompiler
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">config_fc</span> <span class="o">--</span><span class="n">verbose</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span> <span class="o">--</span><span class="n">help</span><span class="o">-</span><span class="n">fcompiler</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">build:</p>
-<div class="highlight-python"><div class="highlight"><pre>python setup.py build --fcompiler=gnu95
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span> <span class="o">--</span><span class="n">fcompiler</span><span class="o">=</span><span class="n">gnu95</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">make a exe installer:</p>
-<div class="highlight-python"><div class="highlight"><pre>python setup.py bdist --format=wininst
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">bdist</span> <span class="o">--</span><span class="nb">format</span><span class="o">=</span><span class="n">wininst</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">make a wheel:</p>
 <p>Example for built 32-bit exe installer:</p>
-<div class="highlight-python"><div class="highlight"><pre>wininst2wheel numpy-1.8.0.win32-py2.7.exe
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">wininst2wheel</span> <span class="n">numpy</span><span class="o">-</span><span class="mf">1.8</span><span class="o">.</span><span class="mf">0.</span><span class="n">win32</span><span class="o">-</span><span class="n">py2</span><span class="o">.</span><span class="mf">7.</span><span class="n">exe</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">install:</p>
-<div class="highlight-python"><div class="highlight"><pre>wheel install numpy-1.8.0-cp27-none-win32.whl
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">wheel</span> <span class="n">install</span> <span class="n">numpy</span><span class="o">-</span><span class="mf">1.8</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">cp27</span><span class="o">-</span><span class="n">none</span><span class="o">-</span><span class="n">win32</span><span class="o">.</span><span class="n">whl</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">test:</p>
-<div class="highlight-python"><div class="highlight"><pre>python -c &#39;import numpy; numpy.test()&#39;
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;import numpy; numpy.test()&#39;</span>
 </pre></div>
 </div>
 </li>
@@ -154,23 +159,23 @@ python setup.py build --help-fcompiler
 <li><p class="first">apply scipy.patch</p>
 </li>
 <li><p class="first">Check fortran compiler with:</p>
-<div class="highlight-python"><div class="highlight"><pre>python setup.py build --fcompiler=gnu95
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span> <span class="o">--</span><span class="n">fcompiler</span><span class="o">=</span><span class="n">gnu95</span>
 </pre></div>
 </div>
 <p>and a second time:</p>
-<div class="highlight-python"><div class="highlight"><pre>python setup.py build --fcompiler=gnu95
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span> <span class="o">--</span><span class="n">fcompiler</span><span class="o">=</span><span class="n">gnu95</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">Build exe installer:</p>
-<div class="highlight-python"><div class="highlight"><pre>python setup.py bdist --format=wininst
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">bdist</span> <span class="o">--</span><span class="nb">format</span><span class="o">=</span><span class="n">wininst</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">install</p>
 </li>
 <li><p class="first">test with:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">scipy</span><span class="p">;</span> <span class="n">scipy</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy</span><span class="p">;</span> <span class="n">scipy</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
 </pre></div>
 </div>
 </li>
@@ -183,7 +188,7 @@ python setup.py build --help-fcompiler
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -206,17 +211,14 @@ python setup.py build --help-fcompiler
 </li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -227,8 +229,8 @@ python setup.py build --help-fcompiler
       &copy;2015-2016, Carl Kleffner and collaborators.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.2.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
       <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/mingwpy.rst"

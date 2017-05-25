@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>MinGW-w64 &mdash; mingwpy 0.1 documentation</title>
+    <title>MinGW-w64 &#8212; mingwpy 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,33 +17,37 @@
         VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
-    <link rel="up" title="Background" href="background.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="BLAS / LAPACK on Windows" href="blas_lapack.html" />
     <link rel="prev" title="Background" href="background.html" />
    
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body>  
+  <body role="document">
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="mingw-w64">
 <h1>MinGW-w64<a class="headerlink" href="#mingw-w64" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="why-choose-mingw-w64-over-mingw">
 <h2>Why choose mingw-w64 over mingw?<a class="headerlink" href="#why-choose-mingw-w64-over-mingw" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="glossary.html#term-mingw-w64"><em class="xref std std-term">mingw-w64</em></a> is a fork of the <a class="reference internal" href="glossary.html#term-mingw"><em class="xref std std-term">mingw</em></a> project.</p>
+<p><a class="reference internal" href="glossary.html#term-mingw-w64"><span class="xref std std-term">mingw-w64</span></a> is a fork of the <a class="reference internal" href="glossary.html#term-mingw"><span class="xref std std-term">mingw</span></a> project.</p>
 <p>To date, numpy and scipy have used versions of the mingw compilers to create
 32-bit binary distributions on Windows.  mingw-w64 has some major advantages
 over mingw, including:</p>
@@ -57,23 +61,23 @@ over mingw, including:</p>
 <div class="section" id="the-mingw-w64-project">
 <h2>The mingw-w64 project<a class="headerlink" href="#the-mingw-w64-project" title="Permalink to this headline">¶</a></h2>
 <p>The mingw-w64 project releases the supporting files to allow the standard
-<a class="reference internal" href="glossary.html#term-gcc"><em class="xref std std-term">gcc</em></a> distribution to compile code that can:</p>
+<a class="reference internal" href="glossary.html#term-gcc"><span class="xref std std-term">gcc</span></a> distribution to compile code that can:</p>
 <ul class="simple">
 <li>make many standard Windows API calls;</li>
-<li>link against standard <a class="reference internal" href="glossary.html#term-mscrt"><em class="xref std std-term">MSCRT</em></a> <a class="reference internal" href="glossary.html#term-runtime-library"><em class="xref std std-term">runtime library</em></a> files.</li>
+<li>link against standard <a class="reference internal" href="glossary.html#term-mscrt"><span class="xref std std-term">MSCRT</span></a> <a class="reference internal" href="glossary.html#term-runtime-library"><span class="xref std std-term">runtime library</span></a> files.</li>
 </ul>
 <p>Among the files the project provides are:</p>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">mingw-w64-headers</span></tt> – header files specific to the Windows
+<li><code class="docutils literal"><span class="pre">mingw-w64-headers</span></code> – header files specific to the Windows
 implementation.</li>
-<li><tt class="docutils literal"><span class="pre">mingw-w64-crt</span></tt> – code for C / C++ runtime libraries (providing
+<li><code class="docutils literal"><span class="pre">mingw-w64-crt</span></code> – code for C / C++ runtime libraries (providing
 functions not directly or reliably available from the MSCRT);</li>
-<li><tt class="docutils literal"><span class="pre">mingw-w64-libraries</span></tt> – libraries for using POSIX threads (<a class="reference external" href="http://locklessinc.com/articles/pthreads_on_windows/">winpthreads</a>), working with MSVC
+<li><code class="docutils literal"><span class="pre">mingw-w64-libraries</span></code> – libraries for using POSIX threads (<a class="reference external" href="http://locklessinc.com/articles/pthreads_on_windows/">winpthreads</a>), working with MSVC
 symbol name mangling (<a class="reference external" href="http://mingw-w64.sourceforge.net/libmangle">libmangle</a>), Windows store compatibility
 (<a class="reference external" href="http://www.jbkempf.com/blog/post/2013/Technical-update-on-the-WinRT-port">winstorecompat</a>),
 structured exception handling (<a class="reference external" href="http://www.reactos.org/wiki/PSEH">pseh</a>);</li>
-<li><tt class="docutils literal"><span class="pre">mingw-w64-tools</span></tt> – tools for: generating DLL export definition
-(<tt class="docutils literal"><span class="pre">def</span></tt>) files (<a class="reference external" href="http://sourceforge.net/p/mingw-w64/wiki2/gendef">gendef</a>); working with the
+<li><code class="docutils literal"><span class="pre">mingw-w64-tools</span></code> – tools for: generating DLL export definition
+(<code class="docutils literal"><span class="pre">def</span></code>) files (<a class="reference external" href="http://sourceforge.net/p/mingw-w64/wiki2/gendef">gendef</a>); working with the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Microsoft_Interface_Definition_Language">Microsoft Interface Description Language</a>
 (<a class="reference external" href="http://manpages.ubuntu.com/manpages/precise/man1/genidl.1.html">genidl</a>,
 <a class="reference external" href="http://manpages.ubuntu.com/manpages/precise/man1/widl.1.html">widl</a>);
@@ -91,8 +95,8 @@ a mingw-w64 compiler toolchain.</p>
 <li>the compiler (gcc, compiled from standard gcc sources), augumented with the
 mingw-w64 extensions, including Windows-specific headers and runtime
 libraries;</li>
-<li>a build of the GNU <a class="reference internal" href="glossary.html#term-binutils"><em class="xref std std-term">binutils</em></a> tools, containing utility programs such
-as <tt class="docutils literal"><span class="pre">ld</span></tt>, <tt class="docutils literal"><span class="pre">ar</span></tt>, <tt class="docutils literal"><span class="pre">dlltool</span></tt>.</li>
+<li>a build of the GNU <a class="reference internal" href="glossary.html#term-binutils"><span class="xref std std-term">binutils</span></a> tools, containing utility programs such
+as <code class="docutils literal"><span class="pre">ld</span></code>, <code class="docutils literal"><span class="pre">ar</span></code>, <code class="docutils literal"><span class="pre">dlltool</span></code>.</li>
 </ul>
 </div>
 <div class="section" id="c-exception-models">
@@ -129,7 +133,7 @@ options are:</p>
 <h2>A more complete software build system<a class="headerlink" href="#a-more-complete-software-build-system" title="Permalink to this headline">¶</a></h2>
 <p>In practice, for building software, you will usually want a wider range of
 tools than just the compiler and binutils utilities.  In particular you will
-probably want tools like the <tt class="docutils literal"><span class="pre">bash</span></tt> shell, <tt class="docutils literal"><span class="pre">make</span></tt>, and the <a class="reference external" href="https://en.wikipedia.org/wiki/GNU_build_system">GNU build
+probably want tools like the <code class="docutils literal"><span class="pre">bash</span></code> shell, <code class="docutils literal"><span class="pre">make</span></code>, and the <a class="reference external" href="https://en.wikipedia.org/wiki/GNU_build_system">GNU build
 system</a>.</p>
 <p><a class="reference external" href="http://sourceforge.net/projects/msys2/">MSYS2</a> provides these.  msys2 is the successor of msys. Msys2 is necessary as
 environment for the mingw build process on Windows.  -
@@ -177,7 +181,7 @@ toolchains can be downloaded from the mingw-w64 sf.net site:
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -195,17 +199,14 @@ toolchains can be downloaded from the mingw-w64 sf.net site:
 </li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -216,8 +217,8 @@ toolchains can be downloaded from the mingw-w64 sf.net site:
       &copy;2015-2016, Carl Kleffner and collaborators.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.2.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
       <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/background-mingw.rst"

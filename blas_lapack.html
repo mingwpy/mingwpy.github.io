@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>BLAS / LAPACK on Windows &mdash; mingwpy 0.1 documentation</title>
+    <title>BLAS / LAPACK on Windows &#8212; mingwpy 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,27 +17,31 @@
         VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
-    <link rel="up" title="Background" href="background.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Issues" href="issues.html" />
     <link rel="prev" title="MinGW-w64" href="background-mingw.html" />
    
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body>  
+  <body role="document">
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="blas-lapack-on-windows">
 <h1>BLAS / LAPACK on Windows<a class="headerlink" href="#blas-lapack-on-windows" title="Permalink to this headline">¶</a></h1>
@@ -85,7 +89,7 @@ format, where we build three ATLAS libraries:</p>
 <li>with support for SSE2 instructions;</li>
 <li>with support for SSE3 instructions;</li>
 </ul>
-<p>We make three Windows <tt class="docutils literal"><span class="pre">.exe</span></tt> installers, one for each of these ATLAS
+<p>We make three Windows <code class="docutils literal"><span class="pre">.exe</span></code> installers, one for each of these ATLAS
 versions, and then build a &#8220;superpack&#8221; installer from these three installers,
 that first checks the machine on which the superpack installer is running, to
 find what instructions the CPU supports, and then installs the matching numpy
@@ -96,19 +100,19 @@ and does not allow pre-install or post-install scripts.</p>
 <p>One option would be to build a binary wheel with ATLAS that depends on SSE2
 instructions.  It seems that 99.5% of Windows machines have SSE2 (see:
 <a class="reference external" href="https://github.com/numpy/numpy/wiki/Windows-versions">Windows versions</a>).  It is not technically difficult to put a check in the
-numpy <tt class="docutils literal"><span class="pre">__init__.py</span></tt> file to give a helpful error message and die when the
+numpy <code class="docutils literal"><span class="pre">__init__.py</span></code> file to give a helpful error message and die when the
 CPU does not have SSE2:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">windll</span><span class="p">,</span> <span class="n">wintypes</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="n">windll</span><span class="p">,</span> <span class="n">wintypes</span>
 <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
     <span class="k">pass</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">has_feature</span> <span class="o">=</span> <span class="n">windll</span><span class="o">.</span><span class="n">kernel32</span><span class="o">.</span><span class="n">IsProcessorFeaturePresent</span>
     <span class="n">has_feature</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">wintypes</span><span class="o">.</span><span class="n">DWORD</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">has_feature</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;This version of numpy needs a CPU capable of SSE2, &quot;</span>
-                <span class="s">&quot;but Windows says - not so.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
-                <span class="s">&quot;Please reinstall numpy using a superpack installer&quot;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;This version of numpy needs a CPU capable of SSE2, &quot;</span>
+                <span class="s2">&quot;but Windows says - not so.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Please reinstall numpy using a superpack installer&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -120,29 +124,16 @@ CPU does not have SSE2:</p>
 the range, <a class="reference external" href="http://www.agner.org/optimize/blog/read.php?i=49#49">except on AMD processors</a>.</p>
 <p>It is closed-source, but available for free under the <a class="reference external" href="https://software.intel.com/sites/campaigns/nest">Community licensing
 program</a>.</p>
-<p>The <a class="reference external" href="https://software.intel.com/en-us/articles/end-user-license-agreement">Intel license</a> does
-allow us, the developers, to distribute copies of the MKL with our built
-binaries, but carries the following extra license terms:</p>
+<p>The MKL is covered by the <a class="reference external" href="https://software.intel.com/en-us/license/intel-simplified-software-license">Intel Simplified Software License</a> (see the <a class="reference external" href="https://software.intel.com/en-us/articles/end-user-license-agreement">Intel license page</a>). The
+Simplified Software License does allow us, the developers, to distribute
+copies of the MKL with our built binaries, where we include their terms of use
+in our distribution.  These include:</p>
 <blockquote>
-<div><ol class="upperalpha" start="8">
-<li><p class="first">DISTRIBUTION: Distribution of the Redistributables is also subject to
-the following limitations:
-[clauses i through iii omitted]</p>
-<p>[You] (iv) will provide the Redistributables subject to a license
-agreement that prohibits disassembly and reverse engineering of the
-Redistributables except in cases when you provide Your Product subject
-to an open source license that is not an Excluded License, for example,
-the BSD license, or the MIT license, (v) will indemnify, hold harmless,
-and defend Intel and its suppliers from and against any claims or
-lawsuits, including attorney&#8217;s fees, that arise or result from Your
-modifications, derivative works or Your distribution of Your Product.</p>
-</li>
-</ol>
-</div></blockquote>
-<p>Clause iv does allow us numpyers (as we use the BSD license) to distribute
-wheels without asking the users to submit to extra licensing terms.
-Unfortunately clause v makes us, the developers, responsible for legal costs
-that could be very large.</p>
+<div>YOU AGREE TO INDEMNIFIY AND HOLD INTEL HARMLESS AGAINST ANY CLAIMS AND
+EXPENSES RESULTING FROM YOUR USE OR UNAUTHORIZED USE OF THE SOFTWARE.</div></blockquote>
+<p>This clause appears to apply to the users of our binaries, not us, the authors
+of the binary.  This is a change from Intel&#8217;s previous MKL license, which
+required us, the authors, to pay Intel&#8217;s legal fees of the user sued Intel.</p>
 <p>See discussions about <a class="reference external" href="http://numpy-discussion.10968.n7.nabble.com/Windows-wheels-using-MKL-td37097.html">MKL on numpy mailing list</a>
 and <a class="reference external" href="https://github.com/JuliaLang/julia/issues/4272">MKL on Julia issues</a>.</p>
 <p>Advantages:</p>
@@ -153,8 +144,7 @@ CPUs.</li>
 </ul>
 <p>Disadvantages:</p>
 <ul class="simple">
-<li>Closed source;</li>
-<li>License terms probably not acceptable to numpy developers.</li>
+<li>Closed source.</li>
 </ul>
 </div>
 <div class="section" id="amd-core-math-library">
@@ -165,8 +155,8 @@ performance.  As of time of writing (December 2015), AMD has marked the ACML
 as &#8220;end of life&#8221;, and suggests using the <a class="reference external" href="http://developer.amd.com/tools-and-sdks/opencl-zone/acl-amd-compute-libraries/">AMD compute libraries</a> instead.</p>
 <p>The ACML does not appear to contain a <a class="reference external" href="http://www.netlib.org/blas/#_cblas">CBLAS</a> interface.</p>
 <p>Binaries linked against ACML have to conform to the <a class="reference external" href="http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/ACML_June_24_2010_v2.pdf">ACML license</a>
-which, as for the MKL, requires software linked to the ACML to subject users
-to the ACML license terms including:</p>
+which, as for the older MKL license, requires software linked to the ACML to
+subject users to the ACML license terms including:</p>
 <blockquote>
 <div><p>2. Restrictions. The Software contains copyrighted and patented
 material, trade secrets and other proprietary material. In order to
@@ -181,8 +171,8 @@ works based upon the Software in whole or in part [...]</p>
 <div class="section" id="amd-compute-libraries">
 <h2>AMD compute libraries<a class="headerlink" href="#amd-compute-libraries" title="Permalink to this headline">¶</a></h2>
 <p>AMD advertise the <a class="reference external" href="http://developer.amd.com/tools-and-sdks/opencl-zone/acl-amd-compute-libraries/">AMD compute libraries</a> (ACL) as the successor to the ACML.</p>
-<p>The ACL page points us to <a class="reference internal" href="#blis-section"><em>BLAS-like instantiation software framework</em></a> for BLAS and
-<a class="reference internal" href="#libflame-section"><em>libflame</em></a> for LAPACK.</p>
+<p>The ACL page points us to <a class="reference internal" href="#blis-section"><span class="std std-ref">BLAS-like instantiation software framework</span></a> for BLAS and
+<a class="reference internal" href="#libflame-section"><span class="std std-ref">libflame</span></a> for LAPACK.</p>
 </div>
 <div class="section" id="blas-like-instantiation-software-framework">
 <span id="blis-section"></span><h2>BLAS-like instantiation software framework<a class="headerlink" href="#blas-like-instantiation-software-framework" title="Permalink to this headline">¶</a></h2>
@@ -275,7 +265,7 @@ be adressed with a single threaded version of that library.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -295,17 +285,14 @@ be adressed with a single threaded version of that library.</p>
 </li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -316,8 +303,8 @@ be adressed with a single threaded version of that library.</p>
       &copy;2015-2016, Carl Kleffner and collaborators.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.2.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
       <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/blas_lapack.rst"

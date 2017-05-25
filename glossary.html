@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Glossary &mdash; mingwpy 0.1 documentation</title>
+    <title>Glossary &#8212; mingwpy 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,26 +17,31 @@
         VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="mingwpy 0.1 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="README for mingwpy.github.io" href="README.html" />
     <link rel="prev" title="Funding request - MinGW-w64 static toolchain" href="proposal_december2015.html" />
    
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body>  
+  <body role="document">
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="glossary">
 <h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
@@ -44,12 +49,14 @@
 <dt id="term-runtime-library">runtime library</dt>
 <dd>Library implementing routines to allow compiled code to interact with
 the runtime environment, such as the operating system.  For example
-the implementation of <tt class="docutils literal"><span class="pre">malloc</span></tt> and friends belongs in the compiler
+the implementation of <code class="docutils literal"><span class="pre">malloc</span></code> and friends belongs in the compiler
 runtime library.</dd>
-<dt id="term-msvc"><span id="term-microsoft-visual-c"></span>MSVC<br />Microsoft Visual C++</dt>
-<dd>The Microsoft standard C / C++ compiler. Part of <a class="reference internal" href="#term-microsoft-visual-studio"><em class="xref std std-term">Microsoft
-Visual Studio</em></a>.</dd>
-<dt id="term-msvs"><span id="term-microsoft-visual-studio"></span>MSVS<br />Microsoft Visual Studio</dt>
+<dt id="term-msvc">MSVC</dt>
+<dt id="term-microsoft-visual-c">Microsoft Visual C++</dt>
+<dd>The Microsoft standard C / C++ compiler. Part of <a class="reference internal" href="#term-microsoft-visual-studio"><span class="xref std std-term">Microsoft
+Visual Studio</span></a>.</dd>
+<dt id="term-msvs">MSVS</dt>
+<dt id="term-microsoft-visual-studio">Microsoft Visual Studio</dt>
 <dd>The Microsoft toolchain for developing applications on Windows.
 Components include MSVC (C / C++) as well as C#, other languages, and
 an IDE.</dd>
@@ -57,7 +64,7 @@ an IDE.</dd>
 <dd>The <a class="reference external" href="https://en.wikipedia.org/wiki/GNU_Compiler_Collection">GNU compiler collection</a>. When we mean the C or C++ compiler
 specifically, we write &#8220;gcc c&#8221; or &#8220;gcc c++&#8221;.</dd>
 <dt id="term-mscrt">MSCRT</dt>
-<dd>Microsoft C <a class="reference internal" href="#term-runtime-library"><em class="xref std std-term">runtime library</em></a> - see <a class="reference external" href="https://en.wikipedia.org/wiki/Microsoft_Windows_library_files#Runtime_libraries">MS runtime libraries</a> and
+<dd>Microsoft C <a class="reference internal" href="#term-runtime-library"><span class="xref std std-term">runtime library</span></a> - see <a class="reference external" href="https://en.wikipedia.org/wiki/Microsoft_Windows_library_files#Runtime_libraries">MS runtime libraries</a> and
 <a class="reference external" href="https://matthew-brett.github.io/pydagogue/python_msvc.html#visual-studio-compiler-versions">table of MSVC versions and CRTs</a>.</dd>
 <dt id="term-glibc">glibc</dt>
 <dd>The <a class="reference external" href="https://www.gnu.org/software/libc">GNU C runtime library</a></dd>
@@ -75,11 +82,12 @@ APIs.&#8221;  See: <a class="reference external" href="http://sourceforge.net/p/
 section</a>.</dd>
 <dt id="term-binutils">binutils</dt>
 <dd>GNU <a class="reference external" href="http://www.gnu.org/software/binutils">binutils</a>: a set of tools to work with compiler output, such as:
-<tt class="docutils literal"><span class="pre">ld</span></tt> (the GNU linker); <tt class="docutils literal"><span class="pre">as</span></tt> (the GNU assembler); <tt class="docutils literal"><span class="pre">dlltool</span></tt>
-(makes files for building and working with DLLs); <tt class="docutils literal"><span class="pre">ar</span></tt> (works with
+<code class="docutils literal"><span class="pre">ld</span></code> (the GNU linker); <code class="docutils literal"><span class="pre">as</span></code> (the GNU assembler); <code class="docutils literal"><span class="pre">dlltool</span></code>
+(makes files for building and working with DLLs); <code class="docutils literal"><span class="pre">ar</span></code> (works with
 archives of compiler object files).  See also the <a class="reference external" href="https://en.wikipedia.org/wiki/GNU_Binutils">binutils wikipedia
 page</a>.</dd>
-<dt id="term-lto"><span id="term-link-time-optimization"></span>LTO<br />Link-time optimization</dt>
+<dt id="term-lto">LTO</dt>
+<dt id="term-link-time-optimization">Link-time optimization</dt>
 <dd>See: <a class="reference external" href="https://gcc.gnu.org/wiki/LinkTimeOptimization">GCC LTO</a>;
 <a class="reference external" href="https://en.wikipedia.org/wiki/Interprocedural_optimization">interprocedural optimization</a>.</dd>
 </dl>
@@ -89,19 +97,16 @@ page</a>.</dd>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -112,8 +117,8 @@ page</a>.</dd>
       &copy;2015-2016, Carl Kleffner and collaborators.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.2.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
       <a href="https://github.com/mingwpy/mingwpy.github.io/edit/source/glossary.rst"
