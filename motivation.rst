@@ -76,4 +76,12 @@ switched to Python from languages like MATLAB for this reason.  It is
 uncomfortable to have to use closed-source tools to build open-source
 software.
 
+*************************************
+Open-source is a security requirement
+*************************************
+
+Security certification requirements, including those that are conducted for
+government, mention access to application sources along with toolchains that
+are used to build those applications.
+
 .. include:: links_names.inc
