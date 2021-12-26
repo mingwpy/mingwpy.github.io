@@ -2,13 +2,23 @@
 Why mingwpy?
 ############
 
-Python.org distributes binary installers for Python that are built with
-:term:`MSVS`.
+Python extensions for Windows should be compiled with the version of
+:term:`MSVS` that was used to compile Python itself. The problem is that for
+every Python this version is different.
 
-It is possible to install a version of MSVS that will build Python extensions
-written in C.
+==========  ======================
+Python 2.7  Visual C++ 2008 (9.0)
+----------  ----------------------
+Python 3.3  Visual C++ 2010 (10.0)
+----------  ----------------------
+Python 3.4  Visual C++ 2010 (10.0)
+----------  ----------------------
+Python 3.5  Visual C++ 2015 (14.0)
+==========  ======================
 
-So |--| why do we need mingwpy?
+So to build extension for 2.7, 3.4 and 3.5 you need to install 3
+different compilers. For other Python versions see the full list at
+http://matthew-brett.github.io/pydagogue/python_msvc.html
 
 ********************************************
 MSVS can be painful to install and configure
